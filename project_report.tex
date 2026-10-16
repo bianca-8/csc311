@@ -1,0 +1,433 @@
+% =========================================================
+% CSC311 Final Project Report Template
+% Single column, 12pt, 8 pages max.
+% =========================================================
+\documentclass[12pt]{article}
+% ---------- Packages ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip} % blank line between paragraphs, no indent
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath, amssymb}
+\usepackage{siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{XCharter}
+\usepackage[xcharter]{newtxmath}
+\usepackage[scaled=0.96]{inconsolata}
+%--------- Headers and footers ------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{14.49998pt}
+\fancyhf{}
+\fancyhead[L]{CSC311 Project Report}
+\fancyhead[R]{Group Members}
+\fancyfoot[C]{\thepage}
+% ---------- Captions & Lists ----------
+\captionsetup{font=small, labelfont=bf}
+\setlist[itemize]{noitemsep, topsep=2pt}
+\setlist[enumerate]{noitemsep, topsep=2pt}
+% ---------- Helpful macros ----------
+\newcommand{\bestmodel}{\textit{[Best Model Name]}}
+\newcommand{\projacc}{\textbf{[XX.XX\%]}}
+% ---------- Safe figure helper ----------
+\makeatletter
+\newcommand{\maybeincludegraphics}[3]{%
+\begin{figure}[h]
+\centering
+\IfFileExists{#1}{%
+\includegraphics[width=0.7\linewidth]{#1}%
+}{%
+\fbox{%
+\parbox[c][0.28\textheight][c]{0.7\linewidth}{%
+\centering
+\vspace{0.5em}
+\textit{[Placeholder for \texttt{#1}]}\\
+Add your figure here.
+\vspace{0.5em}
+}%
+}%
+}%
+\caption{#2}
+\label{#3}
+\end{figure}%
+}
+\makeatother
+\usepackage{xcolor}
+\definecolor{royalblue}{rgb}{0.0, 0.14, 0.4}
+\definecolor{royalblue(web)}{rgb}{0.25, 0.41, 0.88}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{comment}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+% =========================================================
+% Title Page
+% =========================================================
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\Large {CSC311: Introduction to Machine Learning} \par}
+\vspace{1cm}
+{\Large {Project Report} \par}
+\vspace{1cm}
+{\large \textit{Optional Creative Project Title} \par}
+\vspace{3cm}
+{\large Submitted by \par}
+\vspace{0.5cm}
+{\large Group Number}
+\vspace{0.5cm}
+{\large Student 1, Student 2, Student 3, Student 4 \par}
+\vfill
+{\large University of Toronto \\ Fall 2026 \par}
+\end{titlepage}
+\clearpage
+\setcounter{page}{1}
+% ================================================
+% 2. Executive Summary
+% ================================================
+\section{Executive Summary}
+This section should be at most 1/4 page (1 paragraph).
+\begin{itemize}
+\item Summarize the model families you explored (at least three).
+\item State your best-performing model and its projected accuracy.
+\item Provide a high-level justification of why this model outperformed the
+others.
+\end{itemize}
+\section{Data Exploration}\label{sec:data-exploration}
+This section of your report should be at most 2 pages.
+The goal of the Data Exploration step is to understand your dataset well enough to
+decide how to prepare it and which models to try.
+Examine the type and distribution of every feature. Use your findings to decide how
+to pre-process each feature, including normalizing, encoding, and vectorizing the
+text.
+Look for patterns in the data, such as linear or nonlinear relationships between
+the features and the label. These patterns help you decide which model families are
+suitable.
+Determine which features appear predictive, so that you can justify the models you
+choose in the Methodology section.
+Make sure to write down all of this reasoning. State which transformations you
+applied and why, and explain what each plot and table reveals.
+Many students in previous semesters found this section difficult, because most of
+data exploration is not taught explicitly in class. Appendix~\ref{app:data-
+exploration} gives a list of guiding questions to walk you through the process. The
+questions point out the common issues you should look for and the standard
+strategies for handling them.
+\section{Methodology}\label{sec:methodology}
+This section of your report should be at most 3 pages.
+The goal of the Methodology step is to describe how you trained, tuned, and
+evaluated your models in enough detail that a reader could reproduce your results.
+Present the three model families you used and explain why each one suits the
+dataset, drawing on what you found during data exploration. Do not jump straight to
+a deep network, because a simpler model may perform just as well and is easier to
+interpret.
+Make sure to describe how you trained each model so that your results can be
+reproduced. State the optimizer (e.g., SGD or Adam), the learning rate schedule if
+you used one, and any regularization or early stopping. Briefly name the libraries
+you used and describe any custom code you wrote.
+Explain how you split the data into training and validation sets, or how you
+applied cross-validation, so that the reader can trust your comparisons. Tune
+hyperparameters on a validation set that is separate from the training data. Never
+use the test set for training, feature engineering, or tuning.
+Summarize your hyperparameter tuning by stating which hyperparameters you varied,
+how you chose the values to try, and which metric you used to compare them. An
+exhaustive search is not required, but you should show that your choices are
+reasonable.
+Be sure to tune every model family before you compare them. Choosing the best model
+using default hyperparameters and then tuning only that model is unfair to the
+other models, which might improve just as much with tuning. This was the most
+common mistake we saw when grading reports in previous semesters.
+Describe the evaluation metrics you used and justify each one. Report at least one
+metric beyond accuracy, such as precision, recall, or F1, because accuracy alone
+can hide poor performance on one of the classes. Make sure every table and plot has
+appropriate labels and an explanation of what it shows.
+Optionally, you may describe any additional techniques you tried, such as feature
+engineering, clustering, or PCA.
+Appendix~\ref{app:methodology} gives a list of guiding questions to work through
+before you write this section.
+% ===========================================
+% 5. Results
+% ===========================================
+\section{Results}\label{sec:results}
+This section should be at most 1 page.
+The goal of the Results step is to show how well your models performed, explain
+which model you chose, and predict how it will do on the unseen test set.
+Report the results of every model using the evaluation metrics you described in the
+Methodology section. Present them in tables or plots that make the comparison easy
+to read.
+Compare performance across the three model families, and state clearly which model
+you chose as your final model. This must be the model implemented in your
+prediction script.
+Analyze the errors your models make. Describe the common misclassifications or
+weaknesses you observed, and include a confusion matrix or a few illustrative
+examples if they help.
+Estimate your final model's accuracy on the unseen test set as a single number. A
+range will earn no marks. Make sure to support your estimate with empirical
+evidence, such as validation results, the stability of your cross-validation
+scores, learning curves, or consistency across random seeds or folds.
+% ================================================
+% 8. Contributions and Learning
+% ================================================
+\section{Contributions and Learning}
+This section should contain a list of 3–4 bullets, one for each student. Each
+student should write at most three sentences describing their main contributions
+and the most important lesson learned.
+% ==================================================
+% 9. References
+% ==================================================
+\section{References}
+Use references whenever appropriate (e.g., when you consult textbooks, research
+papers, online tutorials, or external code). Cite in the text using \verb|\cite{}|.
+For example, let's cite the two references provided in the \texttt{.bib} file
+\cite{bishop2006prml,hastie2009esl}.
+\bibliographystyle{plain}
+\bibliography{references}
+\newpage
+\appendix
+% Extra space between the subtitle groups and between the questions in the
+appendices.
+\setlist[enumerate,1]{itemsep=1em}
+\setlist[enumerate,2]{itemsep=0.6em}
+% ==================================================
+% Appendix: guiding questions for Data Exploration
+% ==================================================
+\section{Guiding Questions for Data Exploration}\label{app:data-exploration}
+These questions support Section~\ref{sec:data-exploration}. Work through them in
+order, and record your answers for our dataset in that section rather than here.
+This appendix is part of the template instructions, so comment it out before you
+submit, as you do with the rest of the instructions.
+%Define Prediction Task
+%
+%\begin{enumerate}
+%
+%\item Is the task classification or regression? If it is a classification problem,
+what is the number of classes?
+%
+%\end{enumerate}
+\begin{enumerate}
+\item Determine Input to Model
+\begin{enumerate}
+\item For each example, what features do we have? What are the types of the
+features (numerical, categorical, or text)?
+\item In the released data set, each row has a unique ID identifying which student
+provided the data. Why should we not use this unique ID as a feature?
+% What is the distribution of each feature over all the examples? Is the feature
+highly skewed? Is there enough variation? Are there outliers?
+\end{enumerate}
+\item Data Splitting
+\begin{enumerate}
+\item Why is it a good idea to split the provided data into a training set and a
+test set?
+\item Why is it a good idea to do the training and test set splitting based on the
+unique ID identifying each respondent?
+\item What is the role of the validation set and why do we need this third split?
+\item Why should we only perform data exploration on the training set and not on
+the validation or the test sets?
+\end{enumerate}
+\item Feature Distributions
+\smallskip
+One reason for exploring the distributions of features is to get to know the data
+before building any model. This exploration can help us catch common issues such as
+outliers, skewed distributions, class imbalance, missing values, and large
+difference in feature scales.
+\smallskip
+\begin{enumerate}
+\item What should we do when exploring the distributions of the features?
+\item Suppose a feature takes the same value for almost every respondent. Why is
+this feature worth finding, and what would you do about it?
+\item Suppose two features are highly correlated, such as two Likert questions
+that respondents tend to answer the same way. How would you test whether two
+features are highly correlated, and why does a highly correlated pair cause
+trouble?
+\end{enumerate}
+\item Class Imbalance
+\begin{enumerate}
+\item What is class imbalance? Why is class imbalance problematic?
+\item Does the dataset have a class imbalance issue? If so, how severe?
+\item What are some common strategies to address class imbalance?
+\end{enumerate}
+\item Missing Values
+\begin{enumerate}
+\item First, determine if the dataset contains missing values. Report the
+percentage of values missing for each feature in a table. A missing value can take
+many forms such as a null value, an empty string, an empty list, ``n/a'', or ``-''.
+Normalize all of these to a single missing marker before you count, or you will
+underestimate how much is missing.
+\bigskip
+\item Next, for each feature with a substantial missing rate, try to determine why
+the values are likely missing. Different explanations may require different fixes.
+What are some possible explanations for missing values?
+\bigskip
+\item
+Since you never see the missing value, it may not be possible to verify which
+explanation holds. However, it would be useful to determine whether the missingness
+of a feature is related to the label or not. If the missingness is related to the
+label, a missing value itself provides a predictive signal. What is a common
+strategy for determining this?
+\item What are some common strategies to handle missing values? One is called
+imputation.
+\item When is it appropriate to use each strategy above to handle missing values?
+\item
+Suppose that you decide to impute the median value for a numeric feature. Why is it
+problematic to do the imputation on the validation and test sets?
+\item Finally, decide how missing values should be handled for each feature in our
+dataset, and record your decision.
+\end{enumerate}
+\item Outliers
+\begin{enumerate}
+\item What observation might cause you to suspect that certain values are outliers?
+\item How do I determine whether a feature value should be considered an outlier?
+\item What are some strategies to handle outliers?
+\end{enumerate}
+\item Feature Engineering
+\begin{enumerate}
+\item How can we convert the responses to a multi-select question into a feature?
+\item The survey has a few Likert-scale questions that ask respondents to indicate
+their level of agreement to a statement using an ordered set of options (e.g., from
+Strongly Disagree to Strongly Agree). We can convert the Likert-scale responses to
+features by modeling them as ordinal values or one-hot encoded categories. What are
+some advantages and disadvantages of each approach?
+\item At least one free-text question asks for a number. How would you turn such a
+text response into a number, and when would you declare a response unparseable?
+\item What are some strategies to convert the free-text responses to numeric
+features?
+\item One common technique for processing the free-text responses is TF-IDF
+vectorization. Explain this technique in detail. Why is this technique suitable for
+processing the free-text data?
+\item How should we handle a word that appears at prediction time but never in the
+training split?
+\item After encoding all the features, you recorded that there are 1100 features
+and 300 examples. How would the ratio between these two inform your model choices?
+Why would you choose a simpler model with strong regularization over a larger
+model?
+\end{enumerate}
+\item Feature Scaling
+\begin{enumerate}
+\item Two common choices for feature scaling are standardization and min-max
+scaling. Explain each in one sentences. Why do we need to perform feature scaling
+for our dataset, which has Likert-scale, multi-hot encoded, and word count
+features?
+\item Is each model below affected by feature scaling? Briefly explain.
+\begin{itemize}
+\item K-nearest neighbours
+\item Decision trees and random forest
+\item Softmax regression trained using gradient descent
+\item L2 Regularization
+\item Naive Bayes
+\end{itemize}
+\item You decide to standardize a feature. Which split do you use to compute the
+mean and standard deviation, and why?
+\end{enumerate}
+\item Which Features Are Predictive
+\smallskip
+Next, we would like to determine whether a feature is useful by looking at the
+feature together with the label. This analysis could also tell you which model
+families are worth trying and help you justify your model choices in the
+Methodology section.
+\smallskip
+\begin{enumerate}
+\item How do you examine the relationship between a Likert-scale or numeric feature
+and the label?
+\item How do you examine the relationship between a multi-select or free-text
+feature and the label?
+\item Why should you only do this analysis on the training split and not on the
+validation or test splits?
+\item How can you delete whether a feature is worth keeping by comparing the
+difference in mean feature values between classes with the spread of feature values
+within a class?
+\smallskip
+Consider a Likert-scale feature on a scale of 1 to 5. Is the feature worth keeping
+if two classes have means 3.5 and 3.8 while the standard deviation of answers
+within a class is 1.2? What about if two classes have means 2.1 and 4.3 while the
+standard deviation of answers within a class is 0.6?
+\item What does the shape of the relationship tell you about which model families
+to try? Consider the three scenarios below. Discuss the model families you would
+try for each one.
+\begin{enumerate}
+\item The classes separate well along one feature at a threshold.
+\item The middle values of a Likert feature belong to one class while both extremes
+belong to another.
+\item After vectorizing the free-text responses, you have several hundred word-
+count features. No single word separates the classes, but each word in a response
+carries a small amount of evidence.
+\end{enumerate}
+\item Finally, write down the features you expect to be the most predictive, and
+name the plot or the number that led you to each one.
+\end{enumerate}
+\end{enumerate}
+% ==================================================
+% Appendix: guiding questions for Methodology
+% ==================================================
+\section{Guiding Questions for Methodology}\label{app:methodology}
+These questions support Section~\ref{sec:methodology}. Work through them in order,
+and record your answers for our dataset in that section rather than here. This
+appendix is part of the template instructions, so comment it out before you submit,
+as you do with the rest of the instructions.
+\begin{enumerate}
+\item Choosing Model Families
+\begin{enumerate}
+\item Based on the size of the data set, should we consider fine-tuning a large
+language model or starting with simpler models? What are some advantages and
+disadvantages of each approach?
+\item Which findings from your data exploration would support choosing softmax
+regression? Which findings would support choosing a decision tree instead?
+\end{enumerate}
+\item Training Details
+\begin{enumerate}
+\item Suppose you train a multilayer perceptron. Which choices would another
+student need to know to reproduce your results exactly?
+\item Your softmax regression model reaches 95\% accuracy on the training set but
+only 70\% on the validation set. What does this gap tell you, and which
+regularization or early stopping strategies could you try?
+\end{enumerate}
+\item Validation
+\begin{enumerate}
+\item What is cross validation? If we want to use cross validation, why should we
+use grouped cross validation, grouped by the unique ID?
+\item Pre-processing steps such as normalization and text vectorization learn
+values from the data, like a mean or a vocabulary. Which part of the data should
+these values be computed from during cross validation, and why?
+\end{enumerate}
+\item Hyperparameter Tuning
+\begin{enumerate}
+\item Which hyperparameters would you tune for a decision tree, and how would you
+choose the range of values to try?
+\item You try maximum depths from 2 to 10 for a decision tree, and the validation
+accuracy is highest at a depth of 10. Is your search finished? What would you do
+next?
+\item After choosing your final model and its hyperparameters, should you retrain
+it on the training and validation sets combined? What do you gain, and what do you
+lose?
+\end{enumerate}
+\item Comparing Model Families Fairly
+\begin{enumerate}
+\item With default hyperparameters, softmax regression reaches 78\% validation
+accuracy and a decision tree reaches 72\%. You tune softmax regression up to 82\%
+and choose it as your final model. What is wrong with this process, and how would
+you fix it?
+\item Across five folds, model A has a mean validation accuracy 1\% higher than
+model B, but the accuracy of each model varies by about 3\% from fold to fold. Can
+you conclude that model A is better? What else could help you decide?
+\end{enumerate}
+\item Evaluation Metrics
+\begin{enumerate}
+\item Suppose one class makes up 60\% of the training set. What accuracy does a
+model that always predicts this class achieve? Which metric would reveal that this
+model is useless?
+\item How do you compute precision, recall, and F1 for a 3-class problem? What is
+the difference between macro-averaging and weighted averaging, and when would you
+prefer each one?
+\end{enumerate}
+\item Additional Techniques
+\begin{enumerate}
+\item Suppose you apply PCA to several hundred word-count features. How would you
+decide how many components to keep, and which part of the data should you fit PCA
+on?
+\item How could you use a clustering method such as k-means to explore the free-
+text responses? How would you tell whether the clusters improve your predictions?
+\end{enumerate}
+\end{enumerate}
+\end
