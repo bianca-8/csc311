@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  17 OCT 2026 21:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  17 OCT 2026 22:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -873,55 +873,54 @@ LaTeX Font Info:    Font shape `T1/XCharter-TLF/m/it' will be
 {/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/xcharter/xch_rydp4l.enc}]
 LaTeX Font Info:    Font shape `T1/XCharter-TLF/b/n' will be
 (Font)              scaled to size 17.28pt on input line 92.
-LaTeX Font Info:    Trying to load font information for TS1+XCharter-TLF on input line 95.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/xcharter/TS1XCharter-TLF.fd
-File: TS1XCharter-TLF.fd 2020/05/25 (msharpe) Font definitions for TS1/XCharter-TLF.
-)
-LaTeX Font Info:    Font shape `TS1/XCharter-TLF/m/n' will be
-(Font)              scaled to size 12.0pt on input line 95.
-LaTeX Font Info:    Font shape `T1/XCharter-TLF/b/n' will be
-(Font)              scaled to size 12.0pt on input line 116.
-
-
-LaTeX Warning: Reference `app:data- exploration' on page 1 undefined on input line 116.
-
 
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.154 \section
-              {Results}\label{sec:results} [1
+l.157 
+       [1
 
-{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/xcharter/xch1_co4ru4.enc}]
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 183.
+]
+
+[2]
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 241.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 11.52008pt on input line 183.
+(Font)              scaled to size 11.52008pt on input line 241.
+LaTeX Font Info:    Font shape `T1/XCharter-TLF/b/n' will be
+(Font)              scaled to size 12.0pt on input line 243.
 
 
-LaTeX Warning: Citation `bishop2006prml' on page 2 undefined on input line 185.
+LaTeX Warning: Citation `bishop2006prml' on page 3 undefined on input line 243.
 
 
-LaTeX Warning: Citation `hastie2009esl' on page 2 undefined on input line 185.
+LaTeX Warning: Citation `hastie2009esl' on page 3 undefined on input line 243.
 
 No file proposal.bbl.
 
 
-[2{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
-
-[3]
+[3{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
 
 [4]
 
 [5]
+LaTeX Font Info:    Trying to load font information for TS1+XCharter-TLF on input line 373.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/xcharter/TS1XCharter-TLF.fd
+File: TS1XCharter-TLF.fd 2020/05/25 (msharpe) Font definitions for TS1/XCharter-TLF.
+)
+LaTeX Font Info:    Font shape `TS1/XCharter-TLF/m/n' will be
+(Font)              scaled to size 12.0pt on input line 373.
 
-[6]
 
-[7] (./proposal.aux)
+[6{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/xcharter/xch1_co4ru4.enc}]
+
+[7]
+
+[8] (./proposal.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -935,17 +934,17 @@ Package rerunfilecheck Info: File `proposal.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  32644 strings out of 473190
- 656825 string characters out of 5715801
- 982014 words of memory out of 5000000
- 55352 multiletter control sequences out of 15000+600000
+ 656808 string characters out of 5715801
+ 986014 words of memory out of 5000000
+ 55351 multiletter control sequences out of 15000+600000
  600000 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 98i,11n,101p,552b,1384s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,11n,101p,903b,1384s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/xcharter/XCharter-Bold.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/xcharter/XCharter-Italic.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/xcharter/XCharter-Roman.pfb>
-Output written on proposal.pdf (8 pages, 198823 bytes).
+Output written on proposal.pdf (9 pages, 201281 bytes).
 PDF statistics:
- 198 PDF objects out of 1000 (max. 8388607)
- 177 compressed objects within 2 object streams
- 88 named destinations out of 1000 (max. 500000)
+ 201 PDF objects out of 1000 (max. 8388607)
+ 179 compressed objects within 2 object streams
+ 89 named destinations out of 1000 (max. 500000)
  77 words of extra memory for PDF output out of 10000 (max. 10000000)
 

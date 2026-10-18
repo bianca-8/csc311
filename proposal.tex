@@ -80,7 +80,7 @@ Add your figure here.
 \vspace{0.5cm}
 {\large Group Number}
 \vspace{0.5cm}
-{\large Student 1, Student 2, Student 3 \par}
+{\large Bianca Bian, Sylvia Wong, Chris Yang \par}
 \vfill
 {\large University of Toronto \\ Fall 2026 \par}
 \end{titlepage}
@@ -90,91 +90,149 @@ Add your figure here.
 % 2. Executive Summary
 % ================================================
 \section{Executive Summary}
-This section should be at most 1/4 page (1 paragraph).
-\begin{itemize}
-\item Summarize the model families you explored (at least three).
-\item State your best-performing model and its projected accuracy.
-\item Provide a high-level justification of why this model outperformed the
-others.
-\end{itemize}
+% This section should be at most 1/4 page (1 paragraph).
+% \begin{itemize}
+% \item Summarize the model families you explored (at least three).
+% \item State your best-performing model and its projected accuracy.
+% \item Provide a high-level justification of why this model outperformed the
+% others.
+% \end{itemize}
+
+We propose to classify a sport as soccer, baseball, or basketball using survey responses about its accessibility, playing characteristics, and cultural associations. The dataset contains 870 responses from 290 respondents, with 290 examples of each sport. We will compare regularized softmax regression, random forests, and Naive Bayes to investigate how linear relationships, nonlinear interactions, and textual evidence contribute to classification. We hypothesize that softmax regression will provide a strong balance between predictive performance and interpretability when trained on encoded survey responses and TF-IDF text features. We will select the final model using validation results grouped by respondent and assess it using accuracy and macro-F1. A projected test accuracy will be reported after completing these experiments.
+
 \section{Data Exploration}\label{sec:data-exploration}
-This section of your report should be at most 2 pages.
-The goal of the Data Exploration step is to understand your dataset well enough to
-decide how to prepare it and which models to try.
-Examine the type and distribution of every feature. Use your findings to decide how
-to pre-process each feature, including normalizing, encoding, and vectorizing the
-text.
-Look for patterns in the data, such as linear or nonlinear relationships between
-the features and the label. These patterns help you decide which model families are
-suitable.
-Determine which features appear predictive, so that you can justify the models you
-choose in the Methodology section.
-Make sure to write down all of this reasoning. State which transformations you
-applied and why, and explain what each plot and table reveals.
-Many students in previous semesters found this section difficult, because most of
-data exploration is not taught explicitly in class. Appendix~\ref{app:data-
-exploration} gives a list of guiding questions to walk you through the process. The
-questions point out the common issues you should look for and the standard
-strategies for handling them.
+
+The task is supervised classification with three balanced classes: soccer, baseball, and basketball. Each of the 290 respondents contributes three observations. The dataset contains 12 survey features, a respondent identifier, and a sport label. The features include a numerical accessibility rating, three ordered agreement questions, three multi-select questions, four free-text association questions, and one free-text willingness-to-pay question.
+
+The respondent identifier will be used to construct data splits but excluded from the predictive features. All observations from the same respondent will remain in the same split to prevent the model from benefiting from respondent-specific writing styles or response patterns during evaluation.
+
+Feature preparation
+TABLE HERE
+
+Numerical features will be standardized for softmax regression. Text questions will be vectorized separately so that the same word appearing in different questions can receive different weights.
+Missing values and unusual responses
+An initial check found between 7 and 17 empty responses per feature. The song question has the most empty responses: 17 out of 870, approximately 2.0\%. These counts only include blank entries; further exploration will check for placeholders such as “N/A” and other non-informative responses.
+We will inspect numerical values for invalid entries and extreme values. For willingness to pay, we will examine whether a log(1 + price) transformation improves the representation of large positive values. Missingness indicators will allow models to use whether a response is absent as a potential feature.
+Planned exploration
+After establishing the data splits, we will examine feature distributions and relationships with the label using only the training partition. We will compare numerical and agreement-response distributions across sports, plot multi-select frequencies by class, and examine class-associated words in the text responses.
+We hypothesize that songs, colours, foods, playing locations, and seasons may help distinguish the sports. These are proposed relationships to investigate, rather than findings established by the initial inspection.
+
+% This section of your report should be at most 2 pages.
+% The goal of the Data Exploration step is to understand your dataset well enough to
+% decide how to prepare it and which models to try.
+% Examine the type and distribution of every feature. Use your findings to decide how
+% to pre-process each feature, including normalizing, encoding, and vectorizing the
+% text.
+% Look for patterns in the data, such as linear or nonlinear relationships between
+% the features and the label. These patterns help you decide which model families are
+% suitable.
+% Determine which features appear predictive, so that you can justify the models you
+% choose in the Methodology section.
+% Make sure to write down all of this reasoning. State which transformations you
+% applied and why, and explain what each plot and table reveals.
+% Many students in previous semesters found this section difficult, because most of
+% data exploration is not taught explicitly in class. Appendix~\ref{app:data-
+% exploration} gives a list of guiding questions to walk you through the process. The
+% questions point out the common issues you should look for and the standard
+% strategies for handling them.
 \section{Methodology}\label{sec:methodology}
-This section of your report should be at most 3 pages.
-The goal of the Methodology step is to describe how you trained, tuned, and
-evaluated your models in enough detail that a reader could reproduce your results.
-Present the three model families you used and explain why each one suits the
-dataset, drawing on what you found during data exploration. Do not jump straight to
-a deep network, because a simpler model may perform just as well and is easier to
-interpret.
-Make sure to describe how you trained each model so that your results can be
-reproduced. State the optimizer (e.g., SGD or Adam), the learning rate schedule if
-you used one, and any regularization or early stopping. Briefly name the libraries
-you used and describe any custom code you wrote.
-Explain how you split the data into training and validation sets, or how you
-applied cross-validation, so that the reader can trust your comparisons. Tune
-hyperparameters on a validation set that is separate from the training data. Never
-use the test set for training, feature engineering, or tuning.
-Summarize your hyperparameter tuning by stating which hyperparameters you varied,
-how you chose the values to try, and which metric you used to compare them. An
-exhaustive search is not required, but you should show that your choices are
-reasonable.
-Be sure to tune every model family before you compare them. Choosing the best model
-using default hyperparameters and then tuning only that model is unfair to the
-other models, which might improve just as much with tuning. This was the most
-common mistake we saw when grading reports in previous semesters.
-Describe the evaluation metrics you used and justify each one. Report at least one
-metric beyond accuracy, such as precision, recall, or F1, because accuracy alone
-can hide poor performance on one of the classes. Make sure every table and plot has
-appropriate labels and an explanation of what it shows.
-Optionally, you may describe any additional techniques you tried, such as feature
-engineering, clustering, or PCA.
-Appendix~\ref{app:methodology} gives a list of guiding questions to work through
-before you write this section.
+Data splitting and validation
+We will reserve approximately 20% of respondent IDs as an internal test set. On the remaining respondents, we will use five-fold grouped cross-validation for hyperparameter tuning. All three responses from each respondent will remain together throughout this process.
+Imputation values, scaling parameters, categorical vocabularies, and text vocabularies will be learned separately from each fold’s training data. The internal test set will remain unused during feature selection and hyperparameter tuning.
+Model 1: Regularized softmax regression
+Softmax regression will predict the probabilities of the three sports from a combination of structured features and TF-IDF text features. It is appropriate as a relatively simple model for a dataset with many potentially sparse text features. L2 regularization will help control overfitting.
+We will tune the regularization parameter, compare unigrams with unigrams plus bigrams, and vary the minimum document frequency used to retain text features. We will inspect model coefficients to identify which responses contribute most strongly to each prediction.
+Model 2: Random forest
+A random forest will model nonlinear relationships and interactions between responses. For example, the relationship between a season response and a sport may depend on the locations selected by the respondent.
+We will first evaluate the forest using structured features, then test whether adding a restricted text vocabulary improves validation performance. We will tune maximum tree depth, minimum samples per leaf, and the number of features considered at each split. Candidate settings could include 100 and 300 trees, maximum depths of 5, 10, and unrestricted depth, and minimum leaf sizes of 1, 3, and 5.
+Model 3: Naive Bayes
+Multinomial Naive Bayes will provide a probabilistic text baseline using nonnegative word-count or TF-IDF features from the free-text questions. It is computationally inexpensive and can combine many weak word-level signals.
+We will tune the smoothing parameter over values such as 0.1, 0.5, 1, and 2, and compare word counts with TF-IDF. Its conditional-independence assumption may limit performance when words or survey responses are strongly related.
+Fair comparison and feature experiments
+All model families will use the same respondent-based folds and receive hyperparameter tuning before comparison. We will compare structured-only, text-only, and combined representations where appropriate to determine how much each feature group contributes.
+The supplied kNN implementation can serve as an additional reference baseline. We will also report a constant-class baseline, which achieves 33.3\% accuracy on this balanced dataset.
+Evaluation
+We will report accuracy, macro-F1, per-class precision and recall, and confusion matrices. Accuracy measures overall correctness, while macro-F1 gives each sport equal importance and helps reveal uneven performance across classes.
+We will summarize the mean and standard deviation of cross-validation scores. Our primary selection metric will be mean validation accuracy, with macro-F1 and consistency across folds informing close comparisons.
+
+% This section of your report should be at most 3 pages.
+% The goal of the Methodology step is to describe how you trained, tuned, and
+% evaluated your models in enough detail that a reader could reproduce your results.
+% Present the three model families you used and explain why each one suits the
+% dataset, drawing on what you found during data exploration. Do not jump straight to
+% a deep network, because a simpler model may perform just as well and is easier to
+% interpret.
+% Make sure to describe how you trained each model so that your results can be
+% reproduced. State the optimizer (e.g., SGD or Adam), the learning rate schedule if
+% you used one, and any regularization or early stopping. Briefly name the libraries
+% you used and describe any custom code you wrote.
+% Explain how you split the data into training and validation sets, or how you
+% applied cross-validation, so that the reader can trust your comparisons. Tune
+% hyperparameters on a validation set that is separate from the training data. Never
+% use the test set for training, feature engineering, or tuning.
+% Summarize your hyperparameter tuning by stating which hyperparameters you varied,
+% how you chose the values to try, and which metric you used to compare them. An
+% exhaustive search is not required, but you should show that your choices are
+% reasonable.
+% Be sure to tune every model family before you compare them. Choosing the best model
+% using default hyperparameters and then tuning only that model is unfair to the
+% other models, which might improve just as much with tuning. This was the most
+% common mistake we saw when grading reports in previous semesters.
+% Describe the evaluation metrics you used and justify each one. Report at least one
+% metric beyond accuracy, such as precision, recall, or F1, because accuracy alone
+% can hide poor performance on one of the classes. Make sure every table and plot has
+% appropriate labels and an explanation of what it shows.
+% Optionally, you may describe any additional techniques you tried, such as feature
+% engineering, clustering, or PCA.
+% Appendix~\ref{app:methodology} gives a list of guiding questions to work through
+% before you write this section.
+
 % ===========================================
 % 5. Results
 % ===========================================
 \section{Results}\label{sec:results}
-This section should be at most 1 page.
-The goal of the Results step is to show how well your models performed, explain
-which model you chose, and predict how it will do on the unseen test set.
-Report the results of every model using the evaluation metrics you described in the
-Methodology section. Present them in tables or plots that make the comparison easy
-to read.
-Compare performance across the three model families, and state clearly which model
-you chose as your final model. This must be the model implemented in your
-prediction script.
-Analyze the errors your models make. Describe the common misclassifications or
-weaknesses you observed, and include a confusion matrix or a few illustrative
-examples if they help.
-Estimate your final model's accuracy on the unseen test set as a single number. A
-range will earn no marks. Make sure to support your estimate with empirical
-evidence, such as validation results, the stability of your cross-validation
-scores, learning curves, or consistency across random seeds or folds.
+For the proposal, use planned analysis rather than invented scores:
+
+We will summarize the tuned models' cross-validation performance in the following table:
+
+TABLE
+
+We will analyze confusion matrices to determine which sports are most frequently confused. We will also examine whether errors are associated with missing responses, uncommon song titles, ambiguous text, or similar structured answers.
+
+We hypothesize that softmax regression will perform well because regularization can help it handle sparse text features. Random forests may perform better if interactions among structured responses are especially informative. Naive Bayes will establish how effectively word-level evidence alone distinguishes the classes.
+
+After selecting the model and preprocessing configuration, we will evaluate the selected pipeline once on the internal test set. We will use this result, supported by cross-validation stability, to justify a single projected accuracy for the unseen course test set. No defensible numerical estimate is available yet.
+
+% This section should be at most 1 page.
+% The goal of the Results step is to show how well your models performed, explain
+% which model you chose, and predict how it will do on the unseen test set.
+% Report the results of every model using the evaluation metrics you described in the
+% Methodology section. Present them in tables or plots that make the comparison easy
+% to read.
+% Compare performance across the three model families, and state clearly which model
+% you chose as your final model. This must be the model implemented in your
+% prediction script.
+% Analyze the errors your models make. Describe the common misclassifications or
+% weaknesses you observed, and include a confusion matrix or a few illustrative
+% examples if they help.
+% Estimate your final model's accuracy on the unseen test set as a single number. A
+% range will earn no marks. Make sure to support your estimate with empirical
+% evidence, such as validation results, the stability of your cross-validation
+% scores, learning curves, or consistency across random seeds or folds.
+
 % ================================================
 % 8. Contributions and Learning
 % ================================================
 \section{Contributions and Learning}
+
+
+
 This section should contain a list of 3–4 bullets, one for each student. Each
 student should write at most three sentences describing their main contributions
 and the most important lesson learned.
+
+
+
 % ==================================================
 % 9. References
 % ==================================================
