@@ -109,26 +109,45 @@ The respondent identifier will be used to construct data splits but excluded fro
 Feature preparation
 \begin{table}[htbp]
 \centering
-\caption{Survey features, preprocessing pipeline, and machine learning rationale.}
+\scriptsize
+\caption{Comprehensive breakdown of survey features, preprocessing pipeline, and machine learning rationales.}
 \label{tab:feature_preprocessing}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{lllll}
+\begin{tabular}{p{2.5cm} p{2.2cm} p{4.2cm} p{2.5cm} p{4.2cm}}
 \toprule
-\textbf{Feature} & \textbf{Raw Type} & \textbf{Preprocessing Steps} & \textbf{Final Encoding} & \textbf{Machine Learning Rationale} \\
+\textbf{Survey Feature} & \textbf{Raw Data Type} & \textbf{Detailed Preprocessing Steps} & \textbf{Final Representation} & \textbf{Machine Learning Rationale \& Advantage} \\
 \midrule
-Respondent ID (\texttt{id}) & Categorical identifier & Excluded from features; used for grouped splits & Partition Index & Prevents style memorization; guarantees zero data leakage across folds. \\
-Difficulty Rating & Continuous $[0, 10]$ & Mean imputation; Z-score: $(x - \mu)/\sigma$ & Standardized Float & Eliminates scale disparity to assist gradient descent convergence in softmax regression. \\
-Agreement Questions (3) & 5-point Likert & Monotonic mapping: Strongly disagree (1) $\to$ Strongly agree (5) & Ordinal $[1, 5]$ & Preserves natural ordering of sentiment degrees without inflating dimensionality. \\
-Multi-Select (3) & Comma-delimited & Lowercase; split by delimiter; binary indicator expansion & Multi-Hot Vector & Accommodates concurrent non-exclusive responses (e.g., both indoor and outdoor). \\
-Free-Text (4) & Open text phrase & Clean punctuation; lowercase; tokenization; TF-IDF vectorization & TF-IDF + Missing Flag & Downweights common non-informative words (e.g., ``the''); missing flag captures absence signal. \\
-Ticket Price & Unstructured text & Regex digit/unit parsing; median imputation; $\log(1 + x)$ & Log-Transformed Float & Compresses extreme positive skewness (skewness $10.5 \to -1.15$), mitigating outlier impact. \\
-Target Sport (\texttt{label}) & Categorical label & Monotonic mapping: Soccer (0), Baseball (1), Basketball (2) & Integer Class Label & Standard multiclass target format. Exactly balanced (203 per class in train partition). \\
+Respondent ID (\texttt{id}) & Categorical discrete integer & Extracted solely as grouping index; excluded completely from predictive feature set. & Partition grouping index (not in $X$) & Prevents model from memorizing individual writing styles or participant quirks; strictly avoids data leakage across folds. \\
+\midrule
+Ease of Playing (\texttt{difficulty\_rating}) & Numeric scale (0 to 10) & 1. Coerce entries to numeric float; \newline 2. Impute missing values with training mean ($\mu=5.48$); \newline 3. Z-score standard scaling: $(x - \mu)/\sigma$. & Standardized continuous scalar ($\mu=0, \sigma=1$) & Eliminates arbitrary scale disparity, preventing larger-scale inputs from dominating gradients during softmax regression optimization. \\
+\midrule
+Strategy Importance (\texttt{strategy\_importance}) & 5-point Likert scale ordinal text & 1. Ordinal mapping: Strongly disagree (1), Disagree (2), Neutral (3), Agree (4), Strongly agree (5); \newline 2. Neutral imputation (3) for missing entries. & Monotonic integer scalar $\in \{1, 2, 3, 4, 5\}$ & Preserves inherent degree of agreement without inflating feature dimensionality; maintains natural monotonic relationship across classes. \\
+\midrule
+Injury Risk Comfort (\texttt{injury\_risk\_comfort}) & 5-point Likert scale ordinal text & 1. Ordinal mapping: Strongly disagree (1) to Strongly agree (5); \newline 2. Neutral imputation (3). & Monotonic integer scalar $\in \{1, 2, 3, 4, 5\}$ & Retains natural ordinal ordering; captures perception of contact vs non-contact sports effectively. \\
+\midrule
+Individual Brilliance (\texttt{individual\_brilliance}) & 5-point Likert scale ordinal text & 1. Ordinal mapping: Strongly disagree (1) to Strongly agree (5); \newline 2. Neutral imputation (3). & Monotonic integer scalar $\in \{1, 2, 3, 4, 5\}$ & Monotonically models teamwork vs individual star dependency (e.g., distinguishing basketball from soccer). \\
+\midrule
+Playing Locations (\texttt{play\_location}) & Comma-delimited multi-choice text & 1. Standardize text to lowercase; \newline 2. Parse comma delimiters; \newline 3. Extract unique venues; \newline 4. Generate binary indicators (0 or 1). & Multi-hot binary vector (6 indicator dimensions) & Accommodates concurrent, non-mutually exclusive selections (e.g., a sport played at school AND indoor arena). \\
+\midrule
+Toronto Seasons (\texttt{play\_season}) & Comma-delimited multi-choice text & 1. Standardize text to lowercase; \newline 2. Split comma delimiters; \newline 3. Map seasons (Spring, Summer, Fall, Winter) into individual binary flags. & Multi-hot binary vector (4 indicator dimensions) & Allows multiple seasonal activations per sport (e.g., baseball in summer/fall vs indoor winter play). \\
+\midrule
+Music Genres (\texttt{associated\_music}) & Comma-delimited multi-choice text & 1. Standardize text to lowercase; \newline 2. Parse comma delimiters; \newline 3. Expand distinct genres (Hip-hop, Pop, Rock, Latin, etc.) into binary 0/1 columns. & Multi-hot binary vector (11 indicator dimensions) & Captures cultural music affinity without forcing single-label mutual exclusivity. \\
+\midrule
+Foods and Drinks (\texttt{associated\_foods\_drinks}) & Free-form open text phrase & 1. Convert to lowercase; \newline 2. Strip punctuation marks; \newline 3. Tokenize words; \newline 4. Apply TF-IDF weighting; \newline 5. Add missingness indicator. & Sparse TF-IDF vector + binary missing flag & \textbf{TF-IDF Advantage}: Heavily penalizes universal stopwords (``the'', ``and'', ``with''), elevating sport-specific foods (e.g., ``beer'', ``popcorn'', ``hotdog''). \\
+\midrule
+Associated Colour (\texttt{associated\_color}) & Short open text phrase & 1. Lowercase text; \newline 2. Strip punctuation; \newline 3. Tokenize; \newline 4. Extract color tokens and TF-IDF weights; \newline 5. Add missingness flag. & TF-IDF color representation + binary missing flag & Normalizes case differences (``Orange'' vs ``orange'') while prioritizing distinguishing colors (e.g., orange for basketball). \\
+\midrule
+Associated Song (\texttt{associated\_song}) & Open text title/artist phrase & 1. Standardize to lowercase; \newline 2. Strip punctuation; \newline 3. Tokenize words; \newline 4. Apply TF-IDF penalty; \newline 5. Add missingness flag. & Sparse TF-IDF word vector + binary missing flag & Captures recognizable anthem tokens (e.g., ``waka'', ``lights'') while missingness itself provides predictive signal (cold vs popular sports). \\
+\midrule
+Emotional Response (\texttt{emotional\_response}) & Open text emotional descriptions & 1. Convert to lowercase; \newline 2. Strip punctuation; \newline 3. Tokenize words; \newline 4. TF-IDF downweighting; \newline 5. Add missingness flag. & Sparse TF-IDF sentiment vector + binary missing flag & Differentiates emotional excitement vs boredom across sports while suppressing generic filler terms. \\
+\midrule
+Willingness to Pay (\texttt{acceptable\_price}) & Messy text with currency symbols, ranges, words & 1. Regex parsing to strip ``\$'', commas; \newline 2. Midpoint averaging for ranges (``50-100'' $\to$ 75); \newline 3. Word conversion (``thousand'' $\to \times 1000$); \newline 4. Median imputation on train; \newline 5. Variance-stabilizing $\log(1 + x)$ transform. & Log-transformed continuous float & Corrects extreme positive skewness (skewness drops from $+10.5$ to $-1.15$), compressing massive ticket outliers so they do not distort linear weights. \\
+\midrule
+Target Sport (\texttt{label}) & Categorical class string & Map target sports to numeric class labels: Soccer $\to 0$, Baseball $\to 1$, Basketball $\to 2$. & Integer target label $y \in \{0, 1, 2\}$ & Standard multi-class classification target. Classes are perfectly balanced (exactly 203 instances each in the training split). \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
-Numerical features will be standardized for softmax regression. Text questions will be vectorized separately so that the same word appearing in different questions can receive different weights.
+Numerical features will be standardized for softmax regression using parameters fitted strictly on the training partition. For free-text representations, we adopt Term Frequency-Inverse Document Frequency (TF-IDF) rather than simple term frequency. In open survey responses, ubiquitous words such as ``the'', ``a'', and ``with'' occur frequently across all three sports; raw frequency counts would erroneously elevate these uninformative terms to the highest weights. TF-IDF explicitly resolves this by applying an inverse document frequency penalty, heavily downweighting corpus-wide stopwords while amplifying discriminative, sport-specific vocabulary (e.g., ``pitcher'', ``popcorn'', ``court''). Moreover, text fields are vectorized independently so identical words can receive question-specific weights, and binary missing indicators are appended to preserve potential non-response signals.
 Missing values and unusual responses
 An initial check found between 7 and 17 empty responses per feature. The song question has the most empty responses: 17 out of 870, approximately 2.0\%. These counts only include blank entries; further exploration will check for placeholders such as “N/A” and other non-informative responses.
 We will inspect numerical values for invalid entries and extreme values. For willingness to pay, we will examine whether a log(1 + price) transformation improves the representation of large positive values. Missingness indicators will allow models to use whether a response is absent as a potential feature.
