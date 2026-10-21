@@ -107,14 +107,33 @@ The task is supervised classification with three balanced classes: soccer, baseb
 The respondent identifier will be used to construct data splits but excluded from the predictive features. All observations from the same respondent will remain in the same split to prevent the model from benefiting from respondent-specific writing styles or response patterns during evaluation.
 
 Feature preparation
-TABLE HERE
+\begin{table}[htbp]
+\centering
+\caption{Survey features, preprocessing pipeline, and machine learning rationale.}
+\label{tab:feature_preprocessing}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lllll}
+\toprule
+\textbf{Feature} & \textbf{Raw Type} & \textbf{Preprocessing Steps} & \textbf{Final Encoding} & \textbf{Machine Learning Rationale} \\
+\midrule
+Respondent ID (\texttt{id}) & Categorical identifier & Excluded from features; used for grouped splits & Partition Index & Prevents style memorization; guarantees zero data leakage across folds. \\
+Difficulty Rating & Continuous $[0, 10]$ & Mean imputation; Z-score: $(x - \mu)/\sigma$ & Standardized Float & Eliminates scale disparity to assist gradient descent convergence in softmax regression. \\
+Agreement Questions (3) & 5-point Likert & Monotonic mapping: Strongly disagree (1) $\to$ Strongly agree (5) & Ordinal $[1, 5]$ & Preserves natural ordering of sentiment degrees without inflating dimensionality. \\
+Multi-Select (3) & Comma-delimited & Lowercase; split by delimiter; binary indicator expansion & Multi-Hot Vector & Accommodates concurrent non-exclusive responses (e.g., both indoor and outdoor). \\
+Free-Text (4) & Open text phrase & Clean punctuation; lowercase; tokenization; TF-IDF vectorization & TF-IDF + Missing Flag & Downweights common non-informative words (e.g., ``the''); missing flag captures absence signal. \\
+Ticket Price & Unstructured text & Regex digit/unit parsing; median imputation; $\log(1 + x)$ & Log-Transformed Float & Compresses extreme positive skewness (skewness $10.5 \to -1.15$), mitigating outlier impact. \\
+Target Sport (\texttt{label}) & Categorical label & Monotonic mapping: Soccer (0), Baseball (1), Basketball (2) & Integer Class Label & Standard multiclass target format. Exactly balanced (203 per class in train partition). \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
 Numerical features will be standardized for softmax regression. Text questions will be vectorized separately so that the same word appearing in different questions can receive different weights.
 Missing values and unusual responses
 An initial check found between 7 and 17 empty responses per feature. The song question has the most empty responses: 17 out of 870, approximately 2.0\%. These counts only include blank entries; further exploration will check for placeholders such as “N/A” and other non-informative responses.
 We will inspect numerical values for invalid entries and extreme values. For willingness to pay, we will examine whether a log(1 + price) transformation improves the representation of large positive values. Missingness indicators will allow models to use whether a response is absent as a potential feature.
-Planned exploration
-After establishing the data splits, we will examine feature distributions and relationships with the label using only the training partition. We will compare numerical and agreement-response distributions across sports, plot multi-select frequencies by class, and examine class-associated words in the text responses.
+Planned exploration and test-set isolation
+To prevent data snooping and strictly adhere to project guidelines, the dataset is partitioned by respondent ID into 70\% training (203 respondents, 609 observations), 15\% validation (43 respondents, 129 observations), and 15\% internal test (44 respondents, 132 observations). All exploratory distributions, missing-value analyses, and statistical preprocessing parameters (e.g., difficulty mean and standard deviation, ticket price median, and text vocabularies) were computed exclusively on the 70\% training partition, leaving validation and test sets completely untouched.
 We hypothesize that songs, colours, foods, playing locations, and seasons may help distinguish the sports. These are proposed relationships to investigate, rather than findings established by the initial inspection.
 
 % This section of your report should be at most 2 pages.
@@ -137,7 +156,7 @@ We hypothesize that songs, colours, foods, playing locations, and seasons may he
 % strategies for handling them.
 \section{Methodology}\label{sec:methodology}
 Data splitting and validation
-We will reserve approximately 20% of respondent IDs as an internal test set. On the remaining respondents, we will use five-fold grouped cross-validation for hyperparameter tuning. All three responses from each respondent will remain together throughout this process.
+We reserve 15\% of respondent IDs as an internal test set, 15\% as a validation set, and 70\% for model training. On the remaining respondents, we will use five-fold grouped cross-validation for hyperparameter tuning. All three responses from each respondent will remain together throughout this process.
 Imputation values, scaling parameters, categorical vocabularies, and text vocabularies will be learned separately from each fold’s training data. The internal test set will remain unused during feature selection and hyperparameter tuning.
 Model 1: Regularized softmax regression
 Softmax regression will predict the probabilities of the three sports from a combination of structured features and TF-IDF text features. It is appropriate as a relatively simple model for a dataset with many potentially sparse text features. L2 regularization will help control overfitting.
