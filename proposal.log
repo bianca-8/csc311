@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  21 OCT 2026 22:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  22 OCT 2026 08:42
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1052,18 +1052,18 @@ Package rerunfilecheck Info: File `proposal.out' has not changed.
 (rerunfilecheck)             Checksum: B2AE72371C97A11EA4309832E368A67E;224.
  ) 
 Here is how much of TeX's memory you used:
- 32836 strings out of 467525
- 662776 string characters out of 5418982
- 1010355 words of memory out of 5000000
- 61220 multiletter control sequences out of 15000+600000
+ 32847 strings out of 467525
+ 662930 string characters out of 5418982
+ 1004355 words of memory out of 5000000
+ 61224 multiletter control sequences out of 15000+600000
  733471 words of font info for 139 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 98i,12n,108p,1458b,1099s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,12n,108p,1458b,1162s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4b.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/xcharter/XCharter-Bold.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/xcharter/XCharter-Roman.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/xcharter/XCharterMathMI.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/newtx/txmiaX.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/newtx/txsys.pfb>
-Output written on proposal.pdf (4 pages, 180733 bytes).
+Output written on proposal.pdf (4 pages, 182574 bytes).
 PDF statistics:
- 92 PDF objects out of 1000 (max. 8388607)
- 69 compressed objects within 1 object stream
- 14 named destinations out of 1000 (max. 500000)
+ 100 PDF objects out of 1000 (max. 8388607)
+ 77 compressed objects within 1 object stream
+ 21 named destinations out of 1000 (max. 500000)
  29 words of extra memory for PDF output out of 10000 (max. 10000000)
 

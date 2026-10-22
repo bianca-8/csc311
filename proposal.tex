@@ -126,25 +126,27 @@ Outliers are present in the acceptable price feature, with some respondents repo
 \begin{table}[H] \centering \caption{Feature preprocessing summary.} \label{tab:preprocessing} \footnotesize \begin{tabular}{p{2.5cm} p{7.3cm} p{6.5cm}} \toprule \textbf{Feature Group} & \textbf{Preprocessing} & \textbf{Rationale} \\ \midrule Respondent ID & Excluded from predictors; used for grouped partitioning & Prevents overfitting (IDs are not generalizable). \\ Difficulty Rating & Mean imputation ($\mu=5.48$); z-score standardization & Removes scale disparity and handles missing values. \\ Likert Features & Monotonic mapping (1--5); neutral imputation (3) & Preserves ordinal structure while avoiding unnecessary dimensionality. \\ Multi-select Features & Lowercasing; delimiter splitting; multi-hot encoding & Represents multiple simultaneous selections without imposing ordering. \\ Text Features & Lowercasing; punctuation removal; TF--IDF vectorization & Downweights common words and emphasizes discriminative sport-specific terms. \\ Acceptable Price & Regex removal of ``\$'' and commas; conversion of ``thousand'' expressions; median imputation; $\log(1+x)$ transformation & Produces numeric values and reduces extreme positive skewness. \\ Target Label & Map Soccer $\rightarrow 0$, Baseball $\rightarrow 1$, Basketball $\rightarrow 2$ & Creates machine-readable class labels. \\ \bottomrule \end{tabular} \end{table}
 
 \section{Methodology}\label{sec:methodology}
-Data splitting and validation
-We reserve 15\% of respondent IDs as an internal test set, 15\% as a validation set, and 70\% for model training. On the remaining respondents, we will use five-fold grouped cross-validation for hyperparameter tuning. All three responses from each respondent will remain together throughout this process.
-Imputation values, scaling parameters, categorical vocabularies, and text vocabularies will be learned separately from each fold’s training data. The internal test set will remain unused during feature selection and hyperparameter tuning.
-Model 1: Regularized softmax regression
-Softmax regression will predict the probabilities of the three sports from a combination of structured features and TF-IDF text features. It is appropriate as a relatively simple model for a dataset with many potentially sparse text features. L2 regularization will help control overfitting.
-We will tune the regularization parameter, compare unigrams with unigrams plus bigrams, and vary the minimum document frequency used to retain text features. We will inspect model coefficients to identify which responses contribute most strongly to each prediction.
-Model 2: Random forest
-A random forest will model nonlinear relationships and interactions between responses. For example, the relationship between a season response and a sport may depend on the locations selected by the respondent.
-We will first evaluate the forest using structured features, then test whether adding a restricted text vocabulary improves validation performance. We will tune maximum tree depth, minimum samples per leaf, and the number of features considered at each split. Candidate settings could include 100 and 300 trees, maximum depths of 5, 10, and unrestricted depth, and minimum leaf sizes of 1, 3, and 5.
-Model 3: Naive Bayes
-Multinomial Naive Bayes will provide a probabilistic text baseline using nonnegative word-count or TF-IDF features from the free-text questions. It is computationally inexpensive and can combine many weak word-level signals.
-We will tune the smoothing parameter over values such as 0.1, 0.5, 1, and 2, and compare word counts with TF-IDF. Its conditional-independence assumption may limit performance when words or survey responses are strongly related.
-Fair comparison and feature experiments
-All model families will use the same respondent-based folds and receive hyperparameter tuning before comparison. We will compare structured-only, text-only, and combined representations where appropriate to determine how much each feature group contributes.
-The supplied kNN implementation can serve as an additional reference baseline. We will also report a constant-class baseline, which achieves 33.3\% accuracy on this balanced dataset.
-Evaluation
-We will report accuracy, macro-F1, per-class precision and recall, and confusion matrices. Accuracy measures overall correctness, while macro-F1 gives each sport equal importance and helps reveal uneven performance across classes.
-We will summarize the mean and standard deviation of cross-validation scores. Our primary selection metric will be mean validation accuracy, with macro-F1 and consistency across folds informing close comparisons.
+Three model families will be evaluated: Multinomial Logistic Regression, Decision Trees, and Random Forests.
+\begin{itemize} 
+    \item \textbf{Multinomial Logistic Regression}: A linear classification model that models class probabilities. This model typically performs well on high-dimensional sparse feature spaces produced by TF--IDF representations. L1 regularization can be used to select irrelevant features and L2 regularization can be used to prevent overfitting.
+    \item \textbf{Decision Tree}: A non-linear model capable of capturing complex feature interactions while remaining highly interpretable. Decision trees make a good baseline for small datasets as they can capture non-linear relationships without requiring extensive hyperparameter tuning and can handle both categorical (e.g. play\_season) and continuous (e.g. acceptable\_price) features without the need for scaling or transformation. They do risk overfitting, however, if they are not pruned properly.
+    \item \textbf{Random Forest}: An ensemble of decision trees that reduces overfitting and variance while retaining the ability to model non-linear relationships. Bagging can be used to create this random forest, and a random subset of features per tree will be considered to reduce correlation between trees. Random forests are often more accurate than single decision trees, but they are less interpretable and require more computational resources.
+\end{itemize} 
 
+\subsubsection*{Implementation Procedure} 
+\begin{enumerate} 
+    \item Train each model using the training set only. 
+    \item Perform hyperparameter tuning using the validation set: 
+    \begin{itemize} 
+        \item Logistic Regression: regularization type (L1, L2) and different values of $\lambda$ will experimented with.
+        \item Decision Tree: maximum depth, minimum samples per split, minimum samples per leaf, and split criterion (Information Gain or Gini). 
+        \item Random Forest: number of trees, maximum depth, minimum samples per split, minimum samples per leaf, and maximum features per split. 
+    \end{itemize} 
+    \item Evaluate each configuration on the validation set and choose the best model. Metrics to be reported include Accuracy, Precision, Recall, Macro F1-score, and the Confusion Matrix. 
+    \item Select the model and hyperparameter configuration achieving the highest validation Macro F1-score. 
+    \item Retrain the selected model using the combined training and validation data. 
+    \item Evaluate the final model once on the held-out test set and report the values for the evaluated metrics. 
+\end{enumerate}
 % This section of your report should be at most 3 pages.
 % The goal of the Methodology step is to describe how you trained, tuned, and
 % evaluated your models in enough detail that a reader could reproduce your results.
