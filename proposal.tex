@@ -129,7 +129,7 @@ Outliers are present in the acceptable price feature, with some respondents repo
 Three model families will be evaluated: Multinomial Logistic Regression, Decision Trees, and Random Forests.
 \begin{itemize} 
     \item \textbf{Multinomial Logistic Regression}: A linear classification model that models class probabilities. This model typically performs well on high-dimensional sparse feature spaces produced by TF--IDF representations. L1 regularization can be used to select irrelevant features and L2 regularization can be used to prevent overfitting.
-    \item \textbf{Decision Tree}: A non-linear model capable of capturing complex feature interactions while remaining highly interpretable. Decision trees make a good baseline for small datasets as they can capture non-linear relationships without requiring extensive hyperparameter tuning and can handle both categorical (e.g. play\_season) and continuous (e.g. acceptable\_price) features without the need for scaling or transformation. They do risk overfitting, however, if they are not pruned properly.
+    \item \textbf{Multinomial Naive Bayes}: A probabilistic classification model that estimates the likelihood of each sport based on the observed feature values. Naive Bayes computationally inexpensive and is particularly effective for high-dimensional text data and is commonly used with TF--IDF representations. The model assumes that features are conditionally independent given the target class, allowing it to efficiently combine many weak signals from free-text responses such as \texttt{associated\_song}, \texttt{associated\_foods\_drinks}, and \texttt{emotional\_response}. On the downside, this independence assumption is often unrealistic.
     \item \textbf{Random Forest}: An ensemble of decision trees that reduces overfitting and variance while retaining the ability to model non-linear relationships. Bagging can be used to create this random forest, and a random subset of features per tree will be considered to reduce correlation between trees. Random forests are often more accurate than single decision trees, but they are less interpretable and require more computational resources.
 \end{itemize} 
 
@@ -139,7 +139,7 @@ Three model families will be evaluated: Multinomial Logistic Regression, Decisio
     \item Perform hyperparameter tuning using the validation set: 
     \begin{itemize} 
         \item Logistic Regression: regularization type (L1, L2) and different values of $\lambda$ will experimented with.
-        \item Decision Tree: maximum depth, minimum samples per split, minimum samples per leaf, and split criterion (Information Gain or Gini). 
+        \item Multinomial Naive Bayes: smoothing parameter $\alpha$
         \item Random Forest: number of trees, maximum depth, minimum samples per split, minimum samples per leaf, and maximum features per split. 
     \end{itemize} 
     \item Evaluate each configuration on the validation set and choose the best model. Metrics to be reported include Accuracy, Precision, Recall, Macro F1-score, and the Confusion Matrix. 
