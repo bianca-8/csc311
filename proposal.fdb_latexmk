@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1792672970.35922 "/Users/sylviawong/Desktop/Third Year/CSC311/csc311/proposal.tex" "proposal.pdf" "proposal" 1792672971.55835 0
-  "/Users/sylviawong/Desktop/Third Year/CSC311/csc311/proposal.tex" 1792672969.82553 12992 33d935ffaa3c7a5972600c2fa351f600 ""
+["pdflatex"] 1792672997.92827 "/Users/sylviawong/Desktop/Third Year/CSC311/csc311/proposal.tex" "proposal.pdf" "proposal" 1792672998.89552 0
+  "/Users/sylviawong/Desktop/Third Year/CSC311/csc311/proposal.tex" 1792672997.55411 12991 856c7f5e8429ca700ead35e6d0162e0d ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc" 1558214095 7631 5169ff1acd97ff1c4ab83563c99f96f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/xcharter/xch1_co4ru4.enc" 1718825833 4020 e63ebbdab76ac8c53e3407b6e8ca6cbf ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/xcharter/xch_3gllts.enc" 1718825833 3042 55b3ccecc348f70ae21c2b0ba94918b6 ""
@@ -219,9 +219,9 @@
   "/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1788984287 5573038 b99aad5e4898a9034e953632f940512b ""
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774209607 3636776 dc5fa9b6b1453b9d196cd42edf876004 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
-  "proposal.aux" 1792672971.45788 1055 08295a650c042b4faa8f123b5a758dd9 "pdflatex"
-  "proposal.out" 1792672971.45834 224 b2ae72371c97a11ea4309832e368a67e "pdflatex"
-  "proposal.tex" 1792672969.82553 12992 33d935ffaa3c7a5972600c2fa351f600 ""
+  "proposal.aux" 1792672998.80384 1055 08295a650c042b4faa8f123b5a758dd9 "pdflatex"
+  "proposal.out" 1792672998.8043 224 b2ae72371c97a11ea4309832e368a67e "pdflatex"
+  "proposal.tex" 1792672997.55411 12991 856c7f5e8429ca700ead35e6d0162e0d ""
   (generated)
   "proposal.aux"
   "proposal.log"
