@@ -1,1 +1,10 @@
 .venv/
+*.bbl
+*.fdb_latexmk
+*fls
+*.blg
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex.gz
