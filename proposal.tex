@@ -55,7 +55,6 @@ Add your figure here.
 \end{figure}%
 }
 \makeatother
-\usepackage{xcolor}
 \definecolor{royalblue}{rgb}{0.0, 0.14, 0.4}
 \definecolor{royalblue(web)}{rgb}{0.25, 0.41, 0.88}
 \usepackage{tcolorbox}
@@ -94,26 +93,34 @@ Add your figure here.
 % \begin{itemize}
 % \item Summarize the model families you explored (at least three).
 % \item State your best-performing model and its projected accuracy.
-% \item Provide a high-level justification of why this model outperformed the
-% others.
+% \item Provide a high-level justification of why this model outperformed the others.
 % \end{itemize}
 
-We propose to classify a sport as soccer, baseball, or basketball using survey responses about its accessibility, playing characteristics, and cultural associations. The dataset contains 870 responses from 290 respondents, with 290 examples of each sport. We will compare regularized softmax regression, random forests, and Naive Bayes to investigate how linear relationships, nonlinear interactions, and textual evidence contribute to classification. We hypothesize that softmax regression will provide a strong balance between predictive performance and interpretability when trained on encoded survey responses and TF-IDF text features. We will select the final model using validation results grouped by respondent and assess it using accuracy and macro-F1. A projected test accuracy will be reported after completing these experiments.
+We propose to classify a sport as soccer, baseball, or basketball using survey responses about its accessibility, playing characteristics, and cultural associations. The dataset contains 870 responses from 290 respondents, with 290 examples of each sport. We will compare regularized softmax regression, random forests, and Naive Bayes to investigate how linear relationships, nonlinear interactions, and textual evidence contribute to classification. We hypothesize that softmax regression will provide a strong balance between predictive performance and interpretability when trained on encoded survey responses and text features. We will select the final model using validation results grouped by respondent and assess it using accuracy and macro-F1 which is used for multi-class and multi-label classification models. A projected test accuracy will be reported after completing these experiments.
 
 \section{Data Exploration}\label{sec:data-exploration}
+
+% This section of your report should be at most 2 pages.
+% The goal of the Data Exploration step is to understand your dataset well enough to decide how to prepare it and which models to try.
+% Examine the type and distribution of every feature. Use your findings to decide how to pre-process each feature, including normalizing, encoding, and vectorizing the text.
+% Look for patterns in the data, such as linear or nonlinear relationships between the features and the label. These patterns help you decide which model families are suitable.
+% Determine which features appear predictive, so that you can justify the models you choose in the Methodology section.
+% Make sure to write down all of this reasoning. State which transformations you applied and why, and explain what each plot and table reveals.
+% Many students in previous semesters found this section difficult, because most of data exploration is not taught explicitly in class. Appendix A gives a list of guiding questions to
+% walk you through the process. The questions point out the common issues you should look for and the standard strategies for handling them
 
 \subsection*{Dataset Overview and Splitting}
 \begin{itemize}[leftmargin=1.5em]
     \item \textbf{Dataset Composition}: The dataset contains 870 survey responses collected from 290 distinct students, with each respondent evaluating all three sports (Soccer, Baseball, and Basketball).
     \item \textbf{Class Balance}: The target labels are perfectly balanced (290 observations per sport overall; exactly 203 per sport in the 70\% training split). No class rebalancing or oversampling is needed.
     \item \textbf{Respondent Isolation (\texttt{id})}: Each respondent's unique identifier is excluded from the feature matrix $X$ and used exclusively for grouped partitioning. Keeping all responses from the same participant within the same split prevents the model from memorizing respondent-specific vocabulary, bias, or stylistic quirks.
-    \item \textbf{Strict Zero-Leakage Split}: The 290 respondent IDs are partitioned into:
+    \item \textbf{Data Split}: The 290 respondent IDs are partitioned into the following splits by repondent to remove leakage from memorizing specific respondent answers:
     \begin{itemize}
         \item \textbf{Training split (70\%)}: 203 respondents (609 observations) used for exploratory analysis, distribution inspection, and parameter estimation.
         \item \textbf{Validation split (15\%)}: 43 respondents (129 observations) reserved strictly for hyperparameter tuning.
-        \item \textbf{Internal test split (15\%)}: 44 respondents (132 observations) locked away untouched until final model evaluation.
+        \item \textbf{Internal test split (15\%)}: 44 respondents (132 observations) untouched until final model evaluation.
     \end{itemize}
-    All statistical parameters (imputation medians, standard scaling means/stds, and text vocabularies) are learned strictly on the 70\% training split to eliminate data snooping.
+    All statistical parameters (imputation medians, standard scaling means/stds, and text vocabularies) are learned strictly on the 70\% training split.
 \end{itemize}
 
 \subsection*{Feature Preprocessing Pipeline}
@@ -131,16 +138,16 @@ Table~\ref{tab:feature_preprocessing} summarizes the 12 survey features, identif
 Respondent ID (\texttt{id}) & Categorical ID & Excluded from features; used for grouped partition & Grouping Index (not in $X$) & Prevents style memorization; ensures zero leakage across folds. \\
 Ease of Playing (\texttt{difficulty\_rating}) & Numeric (0--10) & Mean imputation ($\mu=5.48$); Z-score standardization & Standardized continuous & Eliminates scale disparity; stabilizes gradient descent convergence. \\
 Strategy Importance (\texttt{strategy\_importance}) & 5-point Likert & Monotonic mapping (1--5); neutral imputation (3) & Ordinal scalar $\in \{1..5\}$ & Preserves ordered agreement degrees without inflating dimensionality. \\
-Injury Risk Comfort (\texttt{injury\_risk\_comfort}) & 5-point Likert & Monotonic mapping (1--5); neutral imputation (3) & Ordinal scalar $\in \{1..5\}$ & Monotonically captures contact vs non-contact sport perception. \\
-Individual Brilliance (\texttt{individual\_brilliance}) & 5-point Likert & Monotonic mapping (1--5); neutral imputation (3) & Ordinal scalar $\in \{1..5\}$ & Differentiates star-driven play (basketball) from collective team play. \\
-Playing Locations (\texttt{play\_location}) & Multi-select CSV & Lowercase; split by delimiter; binary multi-hot expansion & Binary vector (6 dims) & Accommodates concurrent, non-exclusive venues (e.g., school and park). \\
+Injury Risk Comfort (\texttt{injury\_risk\_comfort}) & 5-point Likert & Monotonic mapping (1--5); neutral imputation (3) & Ordinal scalar $\in \{1..5\}$ & Baseball sits about one point below soccer and basketball on the ordered scale. \\
+Individual Brilliance (\texttt{individual\_brilliance}) & 5-point Likert & Monotonic mapping (1--5); neutral imputation (3) & Ordinal scalar $\in \{1..5\}$ & Soccer sits lower than baseball and basketball; those two are close. \\
+Playing Locations (\texttt{play\_location}) & Multi-select CSV & Lowercase; split by delimiter; binary multi-hot expansion & Binary vector (7 dims) & Accommodates concurrent, non-exclusive venues (e.g., school and park). \\
 Toronto Seasons (\texttt{play\_season}) & Multi-select CSV & Lowercase; split seasons; binary multi-hot expansion & Binary vector (4 dims) & Models multi-season playability (e.g., summer/fall outdoor vs winter). \\
-Music Genres (\texttt{associated\_music}) & Multi-select CSV & Lowercase; split genres; binary multi-hot expansion & Binary vector (11 dims) & Captures non-exclusive cultural affinities across musical genres. \\
+Music Genres (\texttt{associated\_music}) & Multi-select CSV & Lowercase; split genres; binary multi-hot expansion & Binary vector (10 dims) & Captures non-exclusive cultural affinities across musical genres. \\
 Foods and Drinks (\texttt{associated\_foods\_drinks}) & Free-form text & Lowercase; strip punctuation; TF-IDF downweighting; missing flag & Sparse TF-IDF + missing flag & \textbf{TF-IDF}: Penalizes generic filler (``the'', ``with''); boosts terms like ``popcorn''. \\
 Associated Colour (\texttt{associated\_color}) & Free-form text & Lowercase; clean punctuation; TF-IDF representation; missing flag & TF-IDF vector + missing flag & Unifies casing (``Orange'' vs ``orange''); isolates discriminative colors. \\
-Associated Song (\texttt{associated\_song}) & Free-form text & Lowercase; clean punctuation; TF-IDF representation; missing flag & Sparse TF-IDF + missing flag & Captures anthem tokens (``waka'', ``lights''); absence signals obscure sports. \\
+Associated Song (\texttt{associated\_song}) & Free-form text & Lowercase; clean punctuation; TF-IDF representation; missing flag & Sparse TF-IDF + missing flag & Blank songs are less common for soccer than for baseball or basketball. \\
 Emotional Response (\texttt{emotional\_response}) & Free-form text & Lowercase; strip punctuation; TF-IDF vectorization; missing flag & Sparse TF-IDF + missing flag & Differentiates excitement vs boredom while filtering non-informative words. \\
-Willingness to Pay (\texttt{acceptable\_price}) & Unstructured text & Regex strip ``\$'', commas; convert ``thousand''; median fill; $\log(1+x)$ & Log continuous scalar & Compresses skewness ($+10.5 \to -1.15$), removing leverage of extreme outliers. \\
+Willingness to Pay (\texttt{acceptable\_price}) & Unstructured text & Regex strip ``\$'', commas; convert ``thousand''; median fill; $\log(1+x)$ & Log continuous scalar & Compresses a right tail from \$0 to \$10{,}000 (training skewness about $+7$ to about $-1.2$). \\
 Target Sport (\texttt{label}) & Class string & Map Soccer $\to 0$, Baseball $\to 1$, Basketball $\to 2$ & Integer label $y \in \{0, 1, 2\}$ & Standard multi-class target; perfectly balanced (203 per class in train split). \\
 \bottomrule
 \end{tabular}%
@@ -149,15 +156,46 @@ Target Sport (\texttt{label}) & Class string & Map Soccer $\to 0$, Baseball $\to
 
 \subsection*{Key Preprocessing Strategies and Rationale}
 \begin{itemize}[leftmargin=1.5em]
-    \item \textbf{TF-IDF vs. Raw Word Counts}: In free-text survey responses, uninformative stopwords such as ``the'', ``a'', and ``with'' appear frequently across all three sports. A simple term-frequency counter would erroneously assign these generic words the highest weights. TF-IDF applies an inverse-document-frequency penalty, heavily discounting common words while amplifying discriminative, sport-specific terms (e.g., ``pitcher'', ``popcorn'', ``court'').
-    \item \textbf{Handling Extreme Outliers with $\log(1+x)$}: Ticket price willingness exhibits extreme positive skewness ($+10.5$), spanning from \$0 to \$100,000. Applying $\log(1+\text{price})$ compresses this long tail, transforming the distribution into a near-symmetric curve (skewness $-1.15$) and preventing outlier respondents from distorting linear model weights.
-    \item \textbf{Informative Missingness Indicators}: Blank responses are rare overall (0.8\% to 2.0\%), with the song feature exhibiting the highest vacancy (17 of 870 entries). Rather than discarding sparse text rows, a binary indicator (\texttt{is\_missing}) is appended to each text feature, allowing models to leverage deliberate omission as a predictive signal (e.g., respondents unable to name a song for less mainstream sports).
+    \item \textbf{TF-IDF vs. Raw Word Counts}: In free-text survey responses, uninformative words such as ``the'', ``a'', and ``with'' appear frequently across all three sports. A simple term-frequency counter would incorrectly assign these generic words the highest weights. TF-IDF applies an inverse-document-frequency penalty, heavily unweighting common words while placing more importance on discriminative, sport-specific terms (e.g., ``pitcher'', ``popcorn'', ``court'').
+    \item \textbf{Handling Extreme Outliers with $\log(1+x)$}: Parsed ticket prices on the training split run from \$0 to \$10{,}000 and are strongly right-skewed (skewness about $+7$). Applying $\log(1+\text{price})$ compresses that tail (skewness about $-1.2$). The transformed values are still mildly left-skewed, but extreme tickets no longer dominate a linear model.
+    \item \textbf{Informative Missingness Indicators}: On the training split, most fields are blank in under 2\% of rows. Foods and drinks are blank in about 3\%. The song field is blank in about 10\% of baseball and basketball responses and about 3\% of soccer responses, so the omission itself is related to the label. A binary indicator (\texttt{is\_missing}) is appended to each text feature instead of dropping those rows.
 \end{itemize}
+
+\subsection*{Feature--Label Patterns}
+The choices in Table~\ref{tab:feature_preprocessing} come from the training split. Difficulty is already a 0--10 number spread across the full scale, so the training mean ($5.48$) fills the few blanks and a z-score puts it on a comparable scale to the other inputs. The Likert answers are ordered, and the class shifts below move in one direction along that order, so we keep a single 1--5 code and fill blanks with Neutral rather than one-hot encoding. Multi-select answers can contain several options at once, so each observed option becomes its own binary column: 7 locations, 4 seasons, and 10 music genres. Free-text answers are lowercased and stripped of punctuation, then represented with TF-IDF plus a missingness flag, because words such as ``the'' and ``with'' would otherwise receive the largest weights. Prices are parsed out of free text before the log transform above. About 8\% of training prices do not parse, at similar rates for all three sports, and those entries take the training median.
+
+Table~\ref{tab:class_means} reports training-split means by sport. Standard deviations within a sport are about 2.0 for difficulty, about 0.8--1.1 for each Likert item, and about 1.6 for log price.
+
+\begin{table}[htbp]
+\centering
+\caption{Training-split means by sport. Log price is computed only on responses that parsed as a number.}
+\label{tab:class_means}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Feature} & \textbf{Baseball} & \textbf{Basketball} & \textbf{Soccer} \\
+\midrule
+Ease of playing (0--10) & 4.18 & 6.05 & 6.22 \\
+Strategy importance (1--5) & 3.45 & 3.92 & 3.88 \\
+Injury-risk comfort (1--5) & 2.85 & 3.81 & 3.77 \\
+Individual brilliance (1--5) & 3.74 & 3.61 & 2.93 \\
+Log ticket price & 3.85 & 4.71 & 4.84 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ease of playing and injury-risk comfort separate baseball from the other two sports by about one within-class standard deviation. Individual brilliance separates soccer, which sits lower, from baseball and basketball, which are close to each other. Strategy and log price move in the same direction, but the gaps are smaller than the spread inside each sport, so they are weaker signals. The Likert answers shift in one direction rather than forming a U-shape. For injury-risk comfort, baseball answers concentrate on Disagree and Neutral, while soccer and basketball concentrate on Agree. Correlations among these five features are modest. The largest is 0.31, between strategy and injury-risk comfort, so the ordered items are not copies of one another.
+
+The multi-select items separate the sports more sharply than the Likert items. On the training split, winter is selected in 61\% of basketball responses, 9\% of soccer responses, and 5\% of baseball responses. An indoor location is selected in 95\% of basketball responses and 27\% of baseball responses. Latin music is selected in 39\% of soccer responses and in under 4\% of the other two sports. Country music is selected in 28\% of baseball responses and in under 5\% of the others. Hip-hop or rap is selected in 83\% of basketball responses, 41\% of soccer responses, and 25\% of baseball responses. ``No particular type'' of music is selected in 32\% of baseball responses and 7\% of basketball responses. These are large differences in binary rates, so a linear classifier can use the multi-hot columns directly. Winter is uncommon overall and still highly predictive, because almost all of those selections belong to basketball.
+
+Song nonresponse follows the label as well: about 10\% of baseball and basketball training responses leave the song blank, compared with about 3\% of soccer responses. That is the reason to keep a missingness indicator. The other text fields are too complete for missingness alone to carry much signal.
+
+These patterns are why Section~\ref{sec:methodology} compares regularized softmax regression, a random forest, and Multinomial Naive Bayes. The dominant pattern is a shift in a mean or a selection rate, which a linear softmax model can represent, and L2 regularization matters once TF-IDF turns the text into a wide sparse matrix relative to 609 training rows. A random forest is still worth fitting because the strongest cues can combine. Basketball, for example, is associated with both winter and indoor locations, and a tree can split on that pair even though each margin is already informative. We did not find a Likert item whose middle values belong to one sport and whose extremes belong to another, so the forest is included for interactions rather than for non-monotonic main effects. Naive Bayes is the text baseline for the remaining case: no single token is expected to separate the classes, but many weak word-level cues can add up. Because several structured features already separate the sports, each family will be compared on structured features, text features, and both together.
 
 \section{Methodology}\label{sec:methodology}
 Data splitting and validation
+
 We reserve 15\% of respondent IDs as an internal test set, 15\% as a validation set, and 70\% for model training. On the remaining respondents, we will use five-fold grouped cross-validation for hyperparameter tuning. All three responses from each respondent will remain together throughout this process.
-Imputation values, scaling parameters, categorical vocabularies, and text vocabularies will be learned separately from each fold’s training data. The internal test set will remain unused during feature selection and hyperparameter tuning.
+Imputation values, scaling parameters, categorical vocabularies, and text vocabularies will be learned separately from each fold's training data. The internal test set will remain unused during feature selection and hyperparameter tuning.
 Model 1: Regularized softmax regression
 Softmax regression will predict the probabilities of the three sports from a combination of structured features and TF-IDF text features. It is appropriate as a relatively simple model for a dataset with many potentially sparse text features. L2 regularization will help control overfitting.
 We will tune the regularization parameter, compare unigrams with unigrams plus bigrams, and vary the minimum document frequency used to retain text features. We will inspect model coefficients to identify which responses contribute most strongly to each prediction.
@@ -167,7 +205,9 @@ We will first evaluate the forest using structured features, then test whether a
 Model 3: Naive Bayes
 Multinomial Naive Bayes will provide a probabilistic text baseline using nonnegative word-count or TF-IDF features from the free-text questions. It is computationally inexpensive and can combine many weak word-level signals.
 We will tune the smoothing parameter over values such as 0.1, 0.5, 1, and 2, and compare word counts with TF-IDF. Its conditional-independence assumption may limit performance when words or survey responses are strongly related.
+
 Fair comparison and feature experiments
+
 All model families will use the same respondent-based folds and receive hyperparameter tuning before comparison. We will compare structured-only, text-only, and combined representations where appropriate to determine how much each feature group contributes.
 The supplied kNN implementation can serve as an additional reference baseline. We will also report a constant-class baseline, which achieves 33.3\% accuracy on this balanced dataset.
 Evaluation
@@ -175,36 +215,16 @@ We will report accuracy, macro-F1, per-class precision and recall, and confusion
 We will summarize the mean and standard deviation of cross-validation scores. Our primary selection metric will be mean validation accuracy, with macro-F1 and consistency across folds informing close comparisons.
 
 % This section of your report should be at most 3 pages.
-% The goal of the Methodology step is to describe how you trained, tuned, and
-% evaluated your models in enough detail that a reader could reproduce your results.
-% Present the three model families you used and explain why each one suits the
-% dataset, drawing on what you found during data exploration. Do not jump straight to
-% a deep network, because a simpler model may perform just as well and is easier to
-% interpret.
-% Make sure to describe how you trained each model so that your results can be
-% reproduced. State the optimizer (e.g., SGD or Adam), the learning rate schedule if
-% you used one, and any regularization or early stopping. Briefly name the libraries
-% you used and describe any custom code you wrote.
+% The goal of the Methodology step is to describe how you trained, tuned, and evaluated your models in enough detail that a reader could reproduce your results.
+% Present the three model families you used and explain why each one suits the dataset, drawing on what you found during data exploration. Do not jump straight to a deep network, because a simpler model may perform just as well and is easier to interpret.
+% Make sure to describe how you trained each model so that your results can be reproduced. State the optimizer (e.g., SGD or Adam), the learning rate schedule if you used one, and any regularization or early stopping. Briefly name the libraries you used and describe any custom code you wrote.
 % Explain how you split the data into training and validation sets, or how you
-% applied cross-validation, so that the reader can trust your comparisons. Tune
-% hyperparameters on a validation set that is separate from the training data. Never
-% use the test set for training, feature engineering, or tuning.
-% Summarize your hyperparameter tuning by stating which hyperparameters you varied,
-% how you chose the values to try, and which metric you used to compare them. An
-% exhaustive search is not required, but you should show that your choices are
-% reasonable.
-% Be sure to tune every model family before you compare them. Choosing the best model
-% using default hyperparameters and then tuning only that model is unfair to the
-% other models, which might improve just as much with tuning. This was the most
-% common mistake we saw when grading reports in previous semesters.
-% Describe the evaluation metrics you used and justify each one. Report at least one
-% metric beyond accuracy, such as precision, recall, or F1, because accuracy alone
-% can hide poor performance on one of the classes. Make sure every table and plot has
-% appropriate labels and an explanation of what it shows.
-% Optionally, you may describe any additional techniques you tried, such as feature
-% engineering, clustering, or PCA.
-% Appendix~\ref{app:methodology} gives a list of guiding questions to work through
-% before you write this section.
+% applied cross-validation, so that the reader can trust your comparisons. Tune hyperparameters on a validation set that is separate from the training data. Never use the test set for training, feature engineering, or tuning.
+% Summarize your hyperparameter tuning by stating which hyperparameters you varied, how you chose the values to try, and which metric you used to compare them. An exhaustive search is not required, but you should show that your choices are reasonable.
+% Be sure to tune every model family before you compare them. Choosing the best model using default hyperparameters and then tuning only that model is unfair to the other models, which might improve just as much with tuning. This was the most common mistake we saw when grading reports in previous semesters.
+% Describe the evaluation metrics you used and justify each one. Report at least one metric beyond accuracy, such as precision, recall, or F1, because accuracy alone can hide poor performance on one of the classes. Make sure every table and plot has appropriate labels and an explanation of what it shows.
+% Optionally, you may describe any additional techniques you tried, such as feature engineering, clustering, or PCA.
+% Appendix~\ref{app:methodology} gives a list of guiding questions to work through before you write this section.
 
 % ===========================================
 % 5. Results
@@ -244,11 +264,17 @@ After selecting the model and preprocessing configuration, we will evaluate the 
 % ================================================
 \section{Contributions and Learning}
 
+Bianca
+- 
+
+Sylvia
+- 
+
+Chris
+- 
 
 
-This section should contain a list of 3–4 bullets, one for each student. Each
-student should write at most three sentences describing their main contributions
-and the most important lesson learned.
+% This section should contain a list of 3-4 bullets, one for each student. Each student should write at most three sentences describing their main contributions and the most important lesson learned.
 
 
 
@@ -264,247 +290,246 @@ For example, let's cite the two references provided in the \texttt{.bib} file
 \bibliography{references}
 \newpage
 \appendix
-% Extra space between the subtitle groups and between the questions in the
-appendices.
+% Extra space between the subtitle groups and between the questions in the appendices.
 \setlist[enumerate,1]{itemsep=1em}
 \setlist[enumerate,2]{itemsep=0.6em}
 % ==================================================
 % Appendix: guiding questions for Data Exploration
-% ==================================================
-\section{Guiding Questions for Data Exploration}\label{app:data-exploration}
-These questions support Section~\ref{sec:data-exploration}. Work through them in
-order, and record your answers for our dataset in that section rather than here.
-This appendix is part of the template instructions, so comment it out before you
-submit, as you do with the rest of the instructions.
-%Define Prediction Task
-%
-%\begin{enumerate}
-%
-%\item Is the task classification or regression? If it is a classification problem,
-what is the number of classes?
-%
-%\end{enumerate}
-\begin{enumerate}
-\item Determine Input to Model
-\begin{enumerate}
-\item For each example, what features do we have? What are the types of the
-features (numerical, categorical, or text)?
-\item In the released data set, each row has a unique ID identifying which student
-provided the data. Why should we not use this unique ID as a feature?
-% What is the distribution of each feature over all the examples? Is the feature
-highly skewed? Is there enough variation? Are there outliers?
-\end{enumerate}
-\item Data Splitting
-\begin{enumerate}
-\item Why is it a good idea to split the provided data into a training set and a
-test set?
-\item Why is it a good idea to do the training and test set splitting based on the
-unique ID identifying each respondent?
-\item What is the role of the validation set and why do we need this third split?
-\item Why should we only perform data exploration on the training set and not on
-the validation or the test sets?
-\end{enumerate}
-\item Feature Distributions
-\smallskip
-One reason for exploring the distributions of features is to get to know the data
-before building any model. This exploration can help us catch common issues such as
-outliers, skewed distributions, class imbalance, missing values, and large
-difference in feature scales.
-\smallskip
-\begin{enumerate}
-\item What should we do when exploring the distributions of the features?
-\item Suppose a feature takes the same value for almost every respondent. Why is
-this feature worth finding, and what would you do about it?
-\item Suppose two features are highly correlated, such as two Likert questions
-that respondents tend to answer the same way. How would you test whether two
-features are highly correlated, and why does a highly correlated pair cause
-trouble?
-\end{enumerate}
-\item Class Imbalance
-\begin{enumerate}
-\item What is class imbalance? Why is class imbalance problematic?
-\item Does the dataset have a class imbalance issue? If so, how severe?
-\item What are some common strategies to address class imbalance?
-\end{enumerate}
-\item Missing Values
-\begin{enumerate}
-\item First, determine if the dataset contains missing values. Report the
-percentage of values missing for each feature in a table. A missing value can take
-many forms such as a null value, an empty string, an empty list, ``n/a'', or ``-''.
-Normalize all of these to a single missing marker before you count, or you will
-underestimate how much is missing.
-\bigskip
-\item Next, for each feature with a substantial missing rate, try to determine why
-the values are likely missing. Different explanations may require different fixes.
-What are some possible explanations for missing values?
-\bigskip
-\item
-Since you never see the missing value, it may not be possible to verify which
-explanation holds. However, it would be useful to determine whether the missingness
-of a feature is related to the label or not. If the missingness is related to the
-label, a missing value itself provides a predictive signal. What is a common
-strategy for determining this?
-\item What are some common strategies to handle missing values? One is called
-imputation.
-\item When is it appropriate to use each strategy above to handle missing values?
-\item
-Suppose that you decide to impute the median value for a numeric feature. Why is it
-problematic to do the imputation on the validation and test sets?
-\item Finally, decide how missing values should be handled for each feature in our
-dataset, and record your decision.
-\end{enumerate}
-\item Outliers
-\begin{enumerate}
-\item What observation might cause you to suspect that certain values are outliers?
-\item How do I determine whether a feature value should be considered an outlier?
-\item What are some strategies to handle outliers?
-\end{enumerate}
-\item Feature Engineering
-\begin{enumerate}
-\item How can we convert the responses to a multi-select question into a feature?
-\item The survey has a few Likert-scale questions that ask respondents to indicate
-their level of agreement to a statement using an ordered set of options (e.g., from
-Strongly Disagree to Strongly Agree). We can convert the Likert-scale responses to
-features by modeling them as ordinal values or one-hot encoded categories. What are
-some advantages and disadvantages of each approach?
-\item At least one free-text question asks for a number. How would you turn such a
-text response into a number, and when would you declare a response unparseable?
-\item What are some strategies to convert the free-text responses to numeric
-features?
-\item One common technique for processing the free-text responses is TF-IDF
-vectorization. Explain this technique in detail. Why is this technique suitable for
-processing the free-text data?
-\item How should we handle a word that appears at prediction time but never in the
-training split?
-\item After encoding all the features, you recorded that there are 1100 features
-and 300 examples. How would the ratio between these two inform your model choices?
-Why would you choose a simpler model with strong regularization over a larger
-model?
-\end{enumerate}
-\item Feature Scaling
-\begin{enumerate}
-\item Two common choices for feature scaling are standardization and min-max
-scaling. Explain each in one sentences. Why do we need to perform feature scaling
-for our dataset, which has Likert-scale, multi-hot encoded, and word count
-features?
-\item Is each model below affected by feature scaling? Briefly explain.
-\begin{itemize}
-\item K-nearest neighbours
-\item Decision trees and random forest
-\item Softmax regression trained using gradient descent
-\item L2 Regularization
-\item Naive Bayes
-\end{itemize}
-\item You decide to standardize a feature. Which split do you use to compute the
-mean and standard deviation, and why?
-\end{enumerate}
-\item Which Features Are Predictive
-\smallskip
-Next, we would like to determine whether a feature is useful by looking at the
-feature together with the label. This analysis could also tell you which model
-families are worth trying and help you justify your model choices in the
-Methodology section.
-\smallskip
-\begin{enumerate}
-\item How do you examine the relationship between a Likert-scale or numeric feature
-and the label?
-\item How do you examine the relationship between a multi-select or free-text
-feature and the label?
-\item Why should you only do this analysis on the training split and not on the
-validation or test splits?
-\item How can you delete whether a feature is worth keeping by comparing the
-difference in mean feature values between classes with the spread of feature values
-within a class?
-\smallskip
-Consider a Likert-scale feature on a scale of 1 to 5. Is the feature worth keeping
-if two classes have means 3.5 and 3.8 while the standard deviation of answers
-within a class is 1.2? What about if two classes have means 2.1 and 4.3 while the
-standard deviation of answers within a class is 0.6?
-\item What does the shape of the relationship tell you about which model families
-to try? Consider the three scenarios below. Discuss the model families you would
-try for each one.
-\begin{enumerate}
-\item The classes separate well along one feature at a threshold.
-\item The middle values of a Likert feature belong to one class while both extremes
-belong to another.
-\item After vectorizing the free-text responses, you have several hundred word-
-count features. No single word separates the classes, but each word in a response
-carries a small amount of evidence.
-\end{enumerate}
-\item Finally, write down the features you expect to be the most predictive, and
-name the plot or the number that led you to each one.
-\end{enumerate}
-\end{enumerate}
-% ==================================================
-% Appendix: guiding questions for Methodology
-% ==================================================
-\section{Guiding Questions for Methodology}\label{app:methodology}
-These questions support Section~\ref{sec:methodology}. Work through them in order,
-and record your answers for our dataset in that section rather than here. This
-appendix is part of the template instructions, so comment it out before you submit,
-as you do with the rest of the instructions.
-\begin{enumerate}
-\item Choosing Model Families
-\begin{enumerate}
-\item Based on the size of the data set, should we consider fine-tuning a large
-language model or starting with simpler models? What are some advantages and
-disadvantages of each approach?
-\item Which findings from your data exploration would support choosing softmax
-regression? Which findings would support choosing a decision tree instead?
-\end{enumerate}
-\item Training Details
-\begin{enumerate}
-\item Suppose you train a multilayer perceptron. Which choices would another
-student need to know to reproduce your results exactly?
-\item Your softmax regression model reaches 95\% accuracy on the training set but
-only 70\% on the validation set. What does this gap tell you, and which
-regularization or early stopping strategies could you try?
-\end{enumerate}
-\item Validation
-\begin{enumerate}
-\item What is cross validation? If we want to use cross validation, why should we
-use grouped cross validation, grouped by the unique ID?
-\item Pre-processing steps such as normalization and text vectorization learn
-values from the data, like a mean or a vocabulary. Which part of the data should
-these values be computed from during cross validation, and why?
-\end{enumerate}
-\item Hyperparameter Tuning
-\begin{enumerate}
-\item Which hyperparameters would you tune for a decision tree, and how would you
-choose the range of values to try?
-\item You try maximum depths from 2 to 10 for a decision tree, and the validation
-accuracy is highest at a depth of 10. Is your search finished? What would you do
-next?
-\item After choosing your final model and its hyperparameters, should you retrain
-it on the training and validation sets combined? What do you gain, and what do you
-lose?
-\end{enumerate}
-\item Comparing Model Families Fairly
-\begin{enumerate}
-\item With default hyperparameters, softmax regression reaches 78\% validation
-accuracy and a decision tree reaches 72\%. You tune softmax regression up to 82\%
-and choose it as your final model. What is wrong with this process, and how would
-you fix it?
-\item Across five folds, model A has a mean validation accuracy 1\% higher than
-model B, but the accuracy of each model varies by about 3\% from fold to fold. Can
-you conclude that model A is better? What else could help you decide?
-\end{enumerate}
-\item Evaluation Metrics
-\begin{enumerate}
-\item Suppose one class makes up 60\% of the training set. What accuracy does a
-model that always predicts this class achieve? Which metric would reveal that this
-model is useless?
-\item How do you compute precision, recall, and F1 for a 3-class problem? What is
-the difference between macro-averaging and weighted averaging, and when would you
-prefer each one?
-\end{enumerate}
-\item Additional Techniques
-\begin{enumerate}
-\item Suppose you apply PCA to several hundred word-count features. How would you
-decide how many components to keep, and which part of the data should you fit PCA
-on?
-\item How could you use a clustering method such as k-means to explore the free-
-text responses? How would you tell whether the clusters improve your predictions?
-\end{enumerate}
-\end{enumerate}
+% % ==================================================
+% \section{Guiding Questions for Data Exploration}\label{app:data-exploration}
+% These questions support Section~\ref{sec:data-exploration}. Work through them in
+% order, and record your answers for our dataset in that section rather than here.
+% This appendix is part of the template instructions, so comment it out before you
+% submit, as you do with the rest of the instructions.
+% %Define Prediction Task
+% %
+% %\begin{enumerate}
+% %
+% %\item Is the task classification or regression? If it is a classification problem,
+% what is the number of classes?
+% %
+% %\end{enumerate}
+% \begin{enumerate}
+% \item Determine Input to Model
+% \begin{enumerate}
+% \item For each example, what features do we have? What are the types of the
+% features (numerical, categorical, or text)?
+% \item In the released data set, each row has a unique ID identifying which student
+% provided the data. Why should we not use this unique ID as a feature?
+% % What is the distribution of each feature over all the examples? Is the feature
+% highly skewed? Is there enough variation? Are there outliers?
+% \end{enumerate}
+% \item Data Splitting
+% \begin{enumerate}
+% \item Why is it a good idea to split the provided data into a training set and a
+% test set?
+% \item Why is it a good idea to do the training and test set splitting based on the
+% unique ID identifying each respondent?
+% \item What is the role of the validation set and why do we need this third split?
+% \item Why should we only perform data exploration on the training set and not on
+% the validation or the test sets?
+% \end{enumerate}
+% \item Feature Distributions
+% \smallskip
+% One reason for exploring the distributions of features is to get to know the data
+% before building any model. This exploration can help us catch common issues such as
+% outliers, skewed distributions, class imbalance, missing values, and large
+% difference in feature scales.
+% \smallskip
+% \begin{enumerate}
+% \item What should we do when exploring the distributions of the features?
+% \item Suppose a feature takes the same value for almost every respondent. Why is
+% this feature worth finding, and what would you do about it?
+% \item Suppose two features are highly correlated, such as two Likert questions
+% that respondents tend to answer the same way. How would you test whether two
+% features are highly correlated, and why does a highly correlated pair cause
+% trouble?
+% \end{enumerate}
+% \item Class Imbalance
+% \begin{enumerate}
+% \item What is class imbalance? Why is class imbalance problematic?
+% \item Does the dataset have a class imbalance issue? If so, how severe?
+% \item What are some common strategies to address class imbalance?
+% \end{enumerate}
+% \item Missing Values
+% \begin{enumerate}
+% \item First, determine if the dataset contains missing values. Report the
+% percentage of values missing for each feature in a table. A missing value can take
+% many forms such as a null value, an empty string, an empty list, ``n/a'', or ``-''.
+% Normalize all of these to a single missing marker before you count, or you will
+% underestimate how much is missing.
+% \bigskip
+% \item Next, for each feature with a substantial missing rate, try to determine why
+% the values are likely missing. Different explanations may require different fixes.
+% What are some possible explanations for missing values?
+% \bigskip
+% \item
+% Since you never see the missing value, it may not be possible to verify which
+% explanation holds. However, it would be useful to determine whether the missingness
+% of a feature is related to the label or not. If the missingness is related to the
+% label, a missing value itself provides a predictive signal. What is a common
+% strategy for determining this?
+% \item What are some common strategies to handle missing values? One is called
+% imputation.
+% \item When is it appropriate to use each strategy above to handle missing values?
+% \item
+% Suppose that you decide to impute the median value for a numeric feature. Why is it
+% problematic to do the imputation on the validation and test sets?
+% \item Finally, decide how missing values should be handled for each feature in our
+% dataset, and record your decision.
+% \end{enumerate}
+% \item Outliers
+% \begin{enumerate}
+% \item What observation might cause you to suspect that certain values are outliers?
+% \item How do I determine whether a feature value should be considered an outlier?
+% \item What are some strategies to handle outliers?
+% \end{enumerate}
+% \item Feature Engineering
+% \begin{enumerate}
+% \item How can we convert the responses to a multi-select question into a feature?
+% \item The survey has a few Likert-scale questions that ask respondents to indicate
+% their level of agreement to a statement using an ordered set of options (e.g., from
+% Strongly Disagree to Strongly Agree). We can convert the Likert-scale responses to
+% features by modeling them as ordinal values or one-hot encoded categories. What are
+% some advantages and disadvantages of each approach?
+% \item At least one free-text question asks for a number. How would you turn such a
+% text response into a number, and when would you declare a response unparseable?
+% \item What are some strategies to convert the free-text responses to numeric
+% features?
+% \item One common technique for processing the free-text responses is TF-IDF
+% vectorization. Explain this technique in detail. Why is this technique suitable for
+% processing the free-text data?
+% \item How should we handle a word that appears at prediction time but never in the
+% training split?
+% \item After encoding all the features, you recorded that there are 1100 features
+% and 300 examples. How would the ratio between these two inform your model choices?
+% Why would you choose a simpler model with strong regularization over a larger
+% model?
+% \end{enumerate}
+% \item Feature Scaling
+% \begin{enumerate}
+% \item Two common choices for feature scaling are standardization and min-max
+% scaling. Explain each in one sentences. Why do we need to perform feature scaling
+% for our dataset, which has Likert-scale, multi-hot encoded, and word count
+% features?
+% \item Is each model below affected by feature scaling? Briefly explain.
+% \begin{itemize}
+% \item K-nearest neighbours
+% \item Decision trees and random forest
+% \item Softmax regression trained using gradient descent
+% \item L2 Regularization
+% \item Naive Bayes
+% \end{itemize}
+% \item You decide to standardize a feature. Which split do you use to compute the
+% mean and standard deviation, and why?
+% \end{enumerate}
+% \item Which Features Are Predictive
+% \smallskip
+% Next, we would like to determine whether a feature is useful by looking at the
+% feature together with the label. This analysis could also tell you which model
+% families are worth trying and help you justify your model choices in the
+% Methodology section.
+% \smallskip
+% \begin{enumerate}
+% \item How do you examine the relationship between a Likert-scale or numeric feature
+% and the label?
+% \item How do you examine the relationship between a multi-select or free-text
+% feature and the label?
+% \item Why should you only do this analysis on the training split and not on the
+% validation or test splits?
+% \item How can you delete whether a feature is worth keeping by comparing the
+% difference in mean feature values between classes with the spread of feature values
+% within a class?
+% \smallskip
+% Consider a Likert-scale feature on a scale of 1 to 5. Is the feature worth keeping
+% if two classes have means 3.5 and 3.8 while the standard deviation of answers
+% within a class is 1.2? What about if two classes have means 2.1 and 4.3 while the
+% standard deviation of answers within a class is 0.6?
+% \item What does the shape of the relationship tell you about which model families
+% to try? Consider the three scenarios below. Discuss the model families you would
+% try for each one.
+% \begin{enumerate}
+% \item The classes separate well along one feature at a threshold.
+% \item The middle values of a Likert feature belong to one class while both extremes
+% belong to another.
+% \item After vectorizing the free-text responses, you have several hundred word-
+% count features. No single word separates the classes, but each word in a response
+% carries a small amount of evidence.
+% \end{enumerate}
+% \item Finally, write down the features you expect to be the most predictive, and
+% name the plot or the number that led you to each one.
+% \end{enumerate}
+% \end{enumerate}
+% % ==================================================
+% % Appendix: guiding questions for Methodology
+% % ==================================================
+% \section{Guiding Questions for Methodology}\label{app:methodology}
+% These questions support Section~\ref{sec:methodology}. Work through them in order,
+% and record your answers for our dataset in that section rather than here. This
+% appendix is part of the template instructions, so comment it out before you submit,
+% as you do with the rest of the instructions.
+% \begin{enumerate}
+% \item Choosing Model Families
+% \begin{enumerate}
+% \item Based on the size of the data set, should we consider fine-tuning a large
+% language model or starting with simpler models? What are some advantages and
+% disadvantages of each approach?
+% \item Which findings from your data exploration would support choosing softmax
+% regression? Which findings would support choosing a decision tree instead?
+% \end{enumerate}
+% \item Training Details
+% \begin{enumerate}
+% \item Suppose you train a multilayer perceptron. Which choices would another
+% student need to know to reproduce your results exactly?
+% \item Your softmax regression model reaches 95\% accuracy on the training set but
+% only 70\% on the validation set. What does this gap tell you, and which
+% regularization or early stopping strategies could you try?
+% \end{enumerate}
+% \item Validation
+% \begin{enumerate}
+% \item What is cross validation? If we want to use cross validation, why should we
+% use grouped cross validation, grouped by the unique ID?
+% \item Pre-processing steps such as normalization and text vectorization learn
+% values from the data, like a mean or a vocabulary. Which part of the data should
+% these values be computed from during cross validation, and why?
+% \end{enumerate}
+% \item Hyperparameter Tuning
+% \begin{enumerate}
+% \item Which hyperparameters would you tune for a decision tree, and how would you
+% choose the range of values to try?
+% \item You try maximum depths from 2 to 10 for a decision tree, and the validation
+% accuracy is highest at a depth of 10. Is your search finished? What would you do
+% next?
+% \item After choosing your final model and its hyperparameters, should you retrain
+% it on the training and validation sets combined? What do you gain, and what do you
+% lose?
+% \end{enumerate}
+% \item Comparing Model Families Fairly
+% \begin{enumerate}
+% \item With default hyperparameters, softmax regression reaches 78\% validation
+% accuracy and a decision tree reaches 72\%. You tune softmax regression up to 82\%
+% and choose it as your final model. What is wrong with this process, and how would
+% you fix it?
+% \item Across five folds, model A has a mean validation accuracy 1\% higher than
+% model B, but the accuracy of each model varies by about 3\% from fold to fold. Can
+% you conclude that model A is better? What else could help you decide?
+% \end{enumerate}
+% \item Evaluation Metrics
+% \begin{enumerate}
+% \item Suppose one class makes up 60\% of the training set. What accuracy does a
+% model that always predicts this class achieve? Which metric would reveal that this
+% model is useless?
+% \item How do you compute precision, recall, and F1 for a 3-class problem? What is
+% the difference between macro-averaging and weighted averaging, and when would you
+% prefer each one?
+% \end{enumerate}
+% \item Additional Techniques
+% \begin{enumerate}
+% \item Suppose you apply PCA to several hundred word-count features. How would you
+% decide how many components to keep, and which part of the data should you fit PCA
+% on?
+% \item How could you use a clustering method such as k-means to explore the free-
+% text responses? How would you tell whether the clusters improve your predictions?
+% \end{enumerate}
+% \end{enumerate}
 \end{document}
